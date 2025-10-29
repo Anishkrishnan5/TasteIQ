@@ -70,7 +70,7 @@ backend/
 ### 1️⃣ Data Layer
 - Pulls real-time menu and nutrition data from **Spoonacular API**  
 - Normalizes and stores it in a local or cloud database (**SQLite → PostgreSQL/RDS**)  
-- Enriches data with embeddings for retrieval (**FAISS / Chroma**)
+- Enriches data with embeddings for retrieval (**Weaviate**)
 
 ### 2️⃣ RAG Pipeline
 - User queries are vectorized and matched against stored embeddings  
@@ -112,7 +112,8 @@ Filters by location, taste profile, and dietary rules
 | **Model Serving** | OpenAI GPT-4o, GPT-3.5 fine-tunes |
 | **Data Ingestion** | Spoonacular API, Pandas |
 | **Database** | SQLite / PostgreSQL (AWS RDS optional) |
-| **Vector Store** | FAISS / Chroma |
+| **Vector Store** | Weaviate |
+| **Retrieval Augmented Generation** | LlamaIndex |
 | **MLOps / Deployment** | Docker, AWS ECS/Fargate, S3, CloudWatch |
 | **Version Control** | Git + GitHub Actions (CI/CD planned) |
 
