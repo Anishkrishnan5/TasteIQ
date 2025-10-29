@@ -6,7 +6,7 @@
 
 ## 🧠 Overview
 
-**Tiberius Eats** is a GenAI-driven system that helps users discover and plan meals based on their preferences, dietary goals, and restaurant availability.
+**TasteIQ** is a GenAI-driven system that helps users discover and plan meals based on their preferences, dietary goals, and restaurant availability.
 
 Using a **Retrieval-Augmented Generation (RAG)** pipeline, the system combines:
 - **Structured data** from the Spoonacular API (menu items, nutrition, recipes, restaurants)
@@ -63,84 +63,89 @@ backend/
 │   └── helpers.py
 └── tests/                    # Unit and integration tests
     └── test_api.py
+```
 
-🔍 System Design
+## 🔍 System Design
 
-1️⃣ Data Layer
+### 1️⃣ Data Layer
+- Pulls real-time menu and nutrition data from **Spoonacular API**  
+- Normalizes and stores it in a local or cloud database (**SQLite → PostgreSQL/RDS**)  
+- Enriches data with embeddings for retrieval (**FAISS / Chroma**)
 
-Pulls real-time menu and nutrition data from Spoonacular API.
+### 2️⃣ RAG Pipeline
+- User queries are vectorized and matched against stored embeddings  
+- Retrieved context is combined with **GPT-4o** prompt templates  
+- GPT synthesizes structured + unstructured information into natural answers
 
-Normalizes and stores it in a local or cloud database (SQLite → PostgreSQL/RDS).
+### 3️⃣ Fine-Tuning Layer
+- **GPT-3.5** models are fine-tuned per cuisine domain *(Asian, Mexican, Fast Food, etc.)*  
+- Fine-tuned models can be dynamically selected based on cuisine classification of the query
 
-Enriches data with embeddings for retrieval (FAISS / Chroma).
+### 4️⃣ Deployment Layer
+- Packaged via **Docker**  
+- Deployable to **AWS ECS/Fargate** or **Lambda (serverless option)**  
+- **S3** for data/artifact storage, **CloudWatch** for logs/metrics
 
-2️⃣ RAG Pipeline
+---
 
-User queries are vectorized and matched against stored embeddings.
+## 🧮 Example Query Flow
 
-Retrieved context is combined with GPT-4o prompt templates.
+**User:**  
+> “I want a low-carb dinner from a fast-food place.”
 
-GPT synthesizes structured + unstructured information into natural answers.
+**RAG Retriever:**  
+Fetches relevant menu items from Spoonacular (low-carb tagged)
 
-3️⃣ Fine-Tuning Layer
+**GPT-4o Reasoning:**  
+Filters by location, taste profile, and dietary rules
 
-GPT-3.5 models are fine-tuned per cuisine domain (Asian, Mexican, Fast Food, etc.).
+**Response:**  
+> “Try *Grilled Chicken Salad* from Chick-fil-A — only **8g net carbs** and **320 calories**.”
 
-Fine-tuned models can be dynamically selected based on cuisine classification of the query.
+---
 
-4️⃣ Deployment Layer
+## 🧰 Tech Stack
 
-Packaged via Docker.
+| Layer | Tools |
+|-------|-------|
+| **Backend** | Python, FastAPI |
+| **Model Serving** | OpenAI GPT-4o, GPT-3.5 fine-tunes |
+| **Data Ingestion** | Spoonacular API, Pandas |
+| **Database** | SQLite / PostgreSQL (AWS RDS optional) |
+| **Vector Store** | FAISS / Chroma |
+| **MLOps / Deployment** | Docker, AWS ECS/Fargate, S3, CloudWatch |
+| **Version Control** | Git + GitHub Actions (CI/CD planned) |
 
-Deployable to AWS ECS/Fargate or Lambda (serverless option).
+---
 
-S3 for data/artifact storage, CloudWatch for logs/metrics.
+## 🧑‍🍳 Future Enhancements
+- 🔁 Continuous fine-tuning pipeline using real user feedback  
+- 🏋️ Fitness integration (Fitbit / Apple Health APIs)  
+- 🧠 User preference memory for long-term personalization  
+- 📊 Evaluation dashboard comparing base GPT-4o vs fine-tuned GPT-3.5 responses  
+- 💬 Multi-turn dialogue state management for richer conversations  
+- 🧩 LangChain integration for modular orchestration  
 
-🧮 Example Query Flow
+---
 
-User: “I want a low-carb dinner from a fast-food place.”
+## 🚀 Deployment Plan
 
-RAG Retriever: Fetches relevant menu items from Spoonacular (low-carb tagged).
+| Stage | Goal |
+|--------|------|
+| **Phase 1** | Local development, Spoonacular ingestion, simple RAG prototype |
+| **Phase 2** | GPT-4o integration + API deployment via FastAPI |
+| **Phase 3** | Fine-tune GPT-3.5 models by cuisine type |
+| **Phase 4** | Containerize and deploy to AWS ECS (free tier) |
+| **Phase 5** | Add automated tests and CI/CD workflow |
 
-GPT-4o Reasoning: Filters by location, taste profile, and dietary rules.
+---
 
-Response:
-“Try Grilled Chicken Salad from Chick-fil-A — only 8g net carbs and 320 calories.”
+## 📦 Installation (Planned)
 
-🧰 Tech Stack
-Layer	Tools
-Backend	Python, FastAPI
-Model Serving	OpenAI GPT-4o, GPT-3.5 fine-tunes
-Data Ingestion	Spoonacular API, Pandas
-Database	SQLite / PostgreSQL (AWS RDS optional)
-Vector Store	FAISS / Chroma
-MLOps / Deployment	Docker, AWS ECS/Fargate, S3, CloudWatch
-Version Control	Git + GitHub Actions (CI/CD planned)
-🧑‍🍳 Future Enhancements
-
-🔁 Continuous Fine-Tuning Pipeline using real user feedback
-
-🏋️ Fitness Integration (Fitbit / Apple Health APIs)
-
-🧠 User Preference Memory for long-term personalization
-
-📊 Evaluation Dashboard comparing base GPT-4o vs fine-tuned GPT-3.5 responses
-
-💬 Multi-Turn Dialogue State Management for richer conversations
-
-🧩 LangChain Integration for modular orchestration
-
-🚀 Deployment Plan
-Stage	Goal
-Phase 1	Local development, Spoonacular ingestion, simple RAG prototype
-Phase 2	GPT-4o integration + API deployment via FastAPI
-Phase 3	Fine-tune GPT-3.5 models by cuisine type
-Phase 4	Containerize and deploy to AWS ECS (free tier)
-Phase 5	Add automated tests and CI/CD workflow
-📦 Installation (Planned)
+```bash
 # Clone the repo
-git clone https://github.com/<yourusername>/tiberius-eats.git
-cd tiberius-eats/backend
+git clone https://github.com/<yourusername>/TasteIQ
+cd TasteIQ/backend
 
 # Set up virtual environment
 python -m venv venv
@@ -154,28 +159,3 @@ cp .env.example .env
 
 # Run locally
 python app.py
-
-📚 References
-
-Spoonacular API Documentation
-
-OpenAI API
-
-AWS ECS & Fargate
-
-LangChain Documentation
-
-🧠 Author
-
-Anish Krishnan
-Machine Learning Engineer | GenAI Systems & Applied ML
-LinkedIn
- • GitHub
-
-🧾 License
-
-This project is open-source and available under the MIT License
-.
-
-⭐ If you like the concept, give the repo a star!
-Building the future of personalized nutrition, one prompt at a time.
