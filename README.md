@@ -114,9 +114,9 @@ Filters by location, taste profile, and dietary rules
 | Layer | Tools |
 |-------|-------|
 | **Backend** | Python, FastAPI |
-| **Model Serving** | OpenAI GPT-4o, GPT-3.5 fine-tunes |
+| **Model Serving** | OpenAI GPT-4o, GPT-3.5 |
 | **Data Ingestion** | Spoonacular API, Pandas |
-| **Database** | SQLite / PostgreSQL (AWS RDS optional) |
+| **Database** | SQLite / PostgreSQL |
 | **Vector Store** | Weaviate |
 | **Retrieval Augmented Generation** | LlamaIndex |
 | **MLOps / Deployment** | Docker, AWS ECS/Fargate, S3, CloudWatch |
