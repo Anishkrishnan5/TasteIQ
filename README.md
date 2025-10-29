@@ -140,7 +140,7 @@ Filters by location, taste profile, and dietary rules
 | **Phase 1** | Local development, Spoonacular ingestion, simple RAG prototype |
 | **Phase 2** | GPT-4o integration + API deployment via FastAPI |
 | **Phase 3** | Fine-tune GPT-3.5 models by cuisine type |
-| **Phase 4** | Containerize and deploy to AWS ECS (free tier) |
+| **Phase 4** | Containerize and deploy to AWS ECS |
 | **Phase 5** | Add automated tests and CI/CD workflow |
 
 ---
