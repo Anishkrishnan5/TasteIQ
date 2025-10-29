@@ -21,6 +21,11 @@ The result is an intelligent conversational agent that can answer queries like:
 
 ---
 
+## 💡 Why This Matters  
+Modern food discovery tools are limited to static filters or crowd-sourced ratings. TasteIQ moves beyond this by combining **nutritional intelligence**, **contextual reasoning**, and **LLM-based personalization**.  
+
+It represents how **applied GenAI systems** can bridge structured data (nutrition, menus) with **human-level conversational understanding** — an approach increasingly used across real-world recommender systems, digital health, and consumer AI.  
+
 ## 🧩 Core Features
 
 | Feature | Description |
@@ -120,12 +125,11 @@ Filters by location, taste profile, and dietary rules
 ---
 
 ## 🧑‍🍳 Future Enhancements
+- 🤖 AI Agent integration (Restaurant Locator Agent, Ordering Agent)
 - 🔁 Continuous fine-tuning pipeline using real user feedback  
-- 🏋️ Fitness integration (Fitbit / Apple Health APIs)  
 - 🧠 User preference memory for long-term personalization  
 - 📊 Evaluation dashboard comparing base GPT-4o vs fine-tuned GPT-3.5 responses  
 - 💬 Multi-turn dialogue state management for richer conversations  
-- 🧩 LangChain integration for modular orchestration  
 
 ---
 
