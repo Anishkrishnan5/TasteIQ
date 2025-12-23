@@ -110,26 +110,14 @@ _End-to-end system behavior and data flow_
 ### **User**
 I want a low-carb dinner from a fast-food place.
 
-markdown
-Copy code
-
 ### **Retriever**
 Fetches low-carb menu items via vector search
-
-markdown
-Copy code
 
 ### **LLM Reasoning**
 Applies dietary constraints and ranking logic
 
-markdown
-Copy code
-
 ### **Response**
 Try Grilled Chicken Salad from Chick-fil-A — ~8g net carbs, 320 calories.
-
-yaml
-Copy code
 
 ---
 
