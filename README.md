@@ -12,26 +12,18 @@ Using a **Retrieval-Augmented Generation (RAG)** pipeline, the system grounds LL
 
 TasteIQ combines:
 
-- Structured data from the **Spoonacular API** (menu items, nutrition, recipes, restaurants)
-- Semantic retrieval over embedded menu items for relevant context selection
-- **GPT-4o** for reasoning, personalization, and recommendation synthesis
-- Cuisine-aware prompt routing for nuanced recommendation styles (e.g. Asian, Mexican, Fast Food)
-
-The system can answer queries such as:
-
-- “Find me a vegan fast-food meal under 600 calories.”
-- “Recommend high-protein Mexican dishes for post-workout recovery.”
-- “What’s a balanced dinner option from Chipotle today?”
+- Structured data from the **Spoonacular API**
+- Semantic retrieval over embedded menu items
+- **GPT-4o** for reasoning and recommendation synthesis
+- Cuisine-aware prompt routing for contextual personalization
 
 ---
 
 ## 💡 Why This Matters
 
-Modern food discovery tools rely on static filters or crowd-sourced ratings, which struggle to handle multiple simultaneous constraints such as nutrition targets, dietary rules, and personal preferences.
+Traditional food discovery tools rely on static filters or ratings, which struggle to handle complex combinations of nutrition goals, dietary rules, and personal preferences.
 
-TasteIQ moves beyond this by combining **nutritional intelligence**, **semantic retrieval**, and **LLM-based reasoning** to produce grounded, personalized recommendations.
-
-This architecture reflects how applied GenAI systems bridge structured data (menus, nutrition) with LLM-driven decision-making — an approach increasingly used in real-world recommender systems, digital health platforms, and consumer AI products.
+TasteIQ demonstrates how **RAG-based GenAI systems** can bridge structured data with LLM reasoning to deliver grounded, personalized recommendations — an approach increasingly used in consumer AI and digital health platforms.
 
 ---
 
@@ -39,139 +31,136 @@ This architecture reflects how applied GenAI systems bridge structured data (men
 
 | Feature | Description |
 |------|------------|
-| 🍔 Restaurant-Aware Search | Integrates with Spoonacular’s restaurant and menu item endpoints to retrieve real fast-food and chain options |
-| 🧬 Nutrition Intelligence | Analyzes and ranks meals based on macronutrients, calories, and dietary constraints |
-| 🧠 RAG-Based Question Answering | Grounds LLM responses in factual nutrition and menu data via semantic retrieval |
-| 🌍 Cuisine-Aware Personalization | Routes queries to cuisine-specific prompt templates |
-| 💬 Conversational AI Interface | GPT-4o handles multi-constraint reasoning and natural dialogue |
-| ☁️ Cloud-Native Deployment | Containerized with Docker and deployable on AWS ECS/Fargate |
+| 🍔 Restaurant-Aware Search | Retrieves real menu items from Spoonacular |
+| 🧬 Nutrition Intelligence | Ranks meals by calories, macros, and constraints |
+| 🧠 RAG-Based QA | Grounds LLM responses in factual menu data |
+| 🌍 Cuisine-Aware Personalization | Cuisine-specific prompt routing |
+| 💬 Conversational Interface | Multi-constraint reasoning via GPT-4o |
+| ☁️ Cloud-Native Deployment | Dockerized and deployable on AWS |
 
 ---
 
 ## 🧱 Planned Architecture
 
+> **Codebase-level view of the system**
+
 ```text
 backend/
-├── app.py                    # FastAPI backend entrypoint
-├── api/                      # API routing layer
+├── app.py                    # FastAPI entrypoint
+├── api/                      # API routing
 │   ├── routes.py
 │   └── __init__.py
-├── services/                 # External service integrations
+├── services/                 # External integrations
 │   ├── spoonacular_api.py
 │   ├── llm_service.py
 │   └── __init__.py
-├── database/                 # Data ingestion & query logic
+├── database/                 # Data ingestion & queries
 │   ├── db.py
 │   ├── ingest_data.py
 │   └── queries.py
-├── rag/                      # RAG pipeline components
+├── rag/                      # RAG pipeline
 │   ├── embeddings.py
 │   ├── retriever.py
 │   └── pipeline.py
-├── evaluation/               # Retrieval + response evaluation
+├── evaluation/               # Retrieval + response eval
 │   ├── metrics.py
 │   └── benchmarks.py
-├── utils/                    # Helper functions
+├── utils/
 │   ├── preprocess.py
 │   └── helpers.py
-└── tests/                    # Unit and integration tests
+└── tests/
     └── test_api.py
 🔍 System Design
+End-to-end system behavior and data flow
+
 1️⃣ Data Layer
-Pulls real-time menu and nutrition data from the Spoonacular API
+Pulls menu and nutrition data from Spoonacular
 
-Normalizes and stores data in a local or cloud database (SQLite → PostgreSQL/RDS)
+Normalizes and stores data (SQLite → PostgreSQL/RDS)
 
-Enriches menu items with embeddings for semantic retrieval (Weaviate)
+Generates embeddings for semantic retrieval (Weaviate)
 
 2️⃣ RAG Pipeline
-User queries are embedded and matched against stored menu embeddings
+User queries are embedded
 
-Top-k retrieved menu items are injected into GPT-4o prompt templates
+Top-k relevant menu items are retrieved
 
-GPT synthesizes responses grounded in retrieved nutritional context
+Retrieved context is injected into GPT-4o prompts
 
-This design significantly reduces hallucinated nutrition facts compared to a prompt-only LLM baseline.
+Responses are grounded in factual nutrition data
 
-3️⃣ Personalization & Model Strategy
-Uses prompt routing based on inferred cuisine and dietary intent
+3️⃣ Personalization Strategy
+Prompt routing based on inferred cuisine and dietary intent
 
-Explores lightweight fine-tuning and prompt variants as an experimental comparison
+Lightweight fine-tuning explored experimentally
 
-Prioritizes retrieval quality and prompt structure over heavy model specialization
+Emphasis on retrieval quality over model specialization
 
 4️⃣ Deployment Layer
-Packaged via Docker for reproducible builds
+Dockerized backend
 
-Deployable to AWS ECS/Fargate or Lambda
+Deployable via AWS ECS/Fargate or Lambda
 
-S3 for data/artifact storage, CloudWatch for logs and metrics
+S3 for artifacts, CloudWatch for logging
 
 🧮 Example Query Flow
 User
 
-css
+text
 Copy code
 I want a low-carb dinner from a fast-food place.
-RAG Retriever
+Retriever
 
-css
+text
 Copy code
-Fetches relevant low-carb menu items from Spoonacular embeddings
-GPT-4o Reasoning
+Fetches low-carb menu items via vector search
+LLM Reasoning
 
-nginx
+text
 Copy code
-Applies dietary constraints, ranking logic, and preference filters
+Applies dietary constraints and ranking logic
 Response
 
-css
+text
 Copy code
-Try Grilled Chicken Salad from Chick-fil-A — approximately 8g net carbs and 320 calories.
+Try Grilled Chicken Salad from Chick-fil-A — ~8g net carbs, 320 calories.
 🧰 Tech Stack
 Layer	Tools
 Backend	Python, FastAPI
-Model Serving	OpenAI GPT-4o
-Data Ingestion	Spoonacular API, Pandas
+LLM	OpenAI GPT-4o
+Data	Spoonacular API, Pandas
 Database	SQLite / PostgreSQL
 Vector Store	Weaviate
-RAG Framework	LlamaIndex
-MLOps / Deployment	Docker, AWS ECS/Fargate, S3, CloudWatch
-Version Control	Git, GitHub Actions
+RAG	LlamaIndex
+Deployment	Docker, AWS ECS/Fargate
+CI/CD	GitHub Actions
 
 🧑‍🍳 Future Enhancements
-🤖 Agent-based extensions (restaurant lookup, ordering workflows)
+Agent-based workflows (ordering, restaurant lookup)
 
-🧠 Long-term user preference memory
+Long-term user preference memory
 
-📊 Expanded evaluation dashboard for retrieval quality and response correctness
+Evaluation dashboard for retrieval quality
 
-💬 Improved multi-turn dialogue state tracking
+Improved multi-turn dialogue state
 
 🚀 Deployment Plan
 Phase	Goal
-Phase 1	Local development, Spoonacular ingestion, RAG prototype
-Phase 2	GPT-4o integration + FastAPI deployment
-Phase 3	Evaluation pipeline and prompt routing
-Phase 4	Containerize and deploy to AWS ECS
-Phase 5	Add automated tests and CI/CD
+Phase 1	Local RAG prototype
+Phase 2	FastAPI + GPT-4o integration
+Phase 3	Evaluation pipeline
+Phase 4	AWS deployment
+Phase 5	CI/CD + testing
 
 📦 Installation (Planned)
 bash
 Copy code
-# Clone the repo
 git clone https://github.com/<yourusername>/TasteIQ
 cd TasteIQ/backend
 
-# Set up virtual environment
 python -m venv venv
 source venv/bin/activate
-
-# Install dependencies
 pip install -r requirements.txt
 
-# Set up environment variables
 cp .env.example .env
-
-# Run locally
 python app.py
