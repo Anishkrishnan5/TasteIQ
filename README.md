@@ -8,7 +8,7 @@ TasteIQ is a GenAI-driven system that helps users discover and plan meals based 
 
 Using a Retrieval-Augmented Generation (RAG) pipeline, the system grounds LLM responses in structured nutrition and menu data, enabling accurate, constraint-aware recommendations rather than free-form hallucinations.
 
-The system combines:
+Using a RAG-based architecture, TasteIQ combines:
 
 Structured data from the Spoonacular API (menu items, nutrition, recipes, restaurants)
 
@@ -26,11 +26,11 @@ The result is an intelligent conversational agent that can answer queries like:
 
 💡 Why This Matters
 
-Modern food discovery tools are limited to static filters or crowd-sourced ratings, which struggle to handle complex constraints like nutrition, dietary rules, and personal preferences simultaneously.
+Modern food discovery tools are limited to static filters or crowd-sourced ratings, which struggle to handle multiple simultaneous constraints such as nutrition targets, dietary rules, and personal preferences.
 
 TasteIQ moves beyond this by combining nutritional intelligence, semantic retrieval, and LLM-based reasoning to produce grounded, personalized recommendations.
 
-It represents how applied GenAI systems can bridge structured data (menus, nutrition) with LLM-driven decision-making — an approach increasingly used across real-world recommender systems, digital health platforms, and consumer AI products.
+It represents how applied GenAI systems bridge structured data (menus, nutrition) with LLM-driven decision-making — an approach increasingly used across real-world recommender systems, digital health platforms, and consumer AI products.
 
 🧩 Core Features
 Feature	Description
