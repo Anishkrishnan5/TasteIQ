@@ -1,55 +1,54 @@
-# TasteIQ
+TasteIQ
 
-> **Personalized restaurant and meal recommendations powered by Retrieval-Augmented Generation (RAG) and fine-tuned LLMs.**
+Personalized restaurant and meal recommendations powered by Retrieval-Augmented Generation (RAG).
 
----
+🧠 Overview
 
-## 🧠 Overview
+TasteIQ is a GenAI-driven system that helps users discover and plan meals based on their preferences, dietary goals, and restaurant availability.
 
-**TasteIQ** is a GenAI-driven system that helps users discover and plan meals based on their preferences, dietary goals, and restaurant availability.
+Using a Retrieval-Augmented Generation (RAG) pipeline, the system grounds LLM responses in structured nutrition and menu data, enabling accurate, constraint-aware recommendations rather than free-form hallucinations.
 
-Using a **Retrieval-Augmented Generation (RAG)** pipeline, the system combines:
-- **Structured data** from the Spoonacular API (menu items, nutrition, recipes, restaurants)
-- **Fine-tuned GPT-3.5 models** for cuisine-specific expertise (e.g. Asian, Mexican, Fast Food)
-- **GPT-4o** for reasoning, personalization, and recommendation synthesis  
+The system combines:
+
+Structured data from the Spoonacular API (menu items, nutrition, recipes, restaurants)
+
+Semantic retrieval over embedded menu items for relevant context selection
+
+GPT-4o for reasoning, personalization, and recommendation synthesis
+
+Cuisine-aware prompt routing for nuanced recommendation styles (e.g. Asian, Mexican, Fast Food)
 
 The result is an intelligent conversational agent that can answer queries like:
 
-> “Find me a vegan fast-food meal under 600 calories.”  
-> “Recommend high-protein Mexican dishes for post-workout recovery.”  
-> “What’s a balanced dinner option from Chipotle today?”
+“Find me a vegan fast-food meal under 600 calories.”
+“Recommend high-protein Mexican dishes for post-workout recovery.”
+“What’s a balanced dinner option from Chipotle today?”
 
----
+💡 Why This Matters
 
-## 💡 Why This Matters  
-Modern food discovery tools are limited to static filters or crowd-sourced ratings. TasteIQ moves beyond this by combining **nutritional intelligence**, **contextual reasoning**, and **LLM-based personalization**.  
+Modern food discovery tools are limited to static filters or crowd-sourced ratings, which struggle to handle complex constraints like nutrition, dietary rules, and personal preferences simultaneously.
 
-It represents how **applied GenAI systems** can bridge structured data (nutrition, menus) with **human-level conversational understanding** — an approach increasingly used across real-world recommender systems, digital health, and consumer AI.  
+TasteIQ moves beyond this by combining nutritional intelligence, semantic retrieval, and LLM-based reasoning to produce grounded, personalized recommendations.
 
-## 🧩 Core Features
+It represents how applied GenAI systems can bridge structured data (menus, nutrition) with LLM-driven decision-making — an approach increasingly used across real-world recommender systems, digital health platforms, and consumer AI products.
 
-| Feature | Description |
-|----------|-------------|
-| 🍔 **Restaurant-Aware Search** | Integrates with Spoonacular’s restaurant and menu item endpoints to retrieve real fast-food and chain options. |
-| 🧬 **Nutrition Intelligence** | Automatically analyzes and ranks meals based on macronutrients, calories, and dietary constraints. |
-| 🧠 **RAG-Based Question Answering** | Combines structured nutritional data with GPT reasoning for factual, context-aware answers. |
-| 🌍 **Cuisine-Specific Personalization** | Uses fine-tuned GPT-3.5 models per cuisine type for nuanced recommendations. |
-| 💬 **Conversational AI Interface** | GPT-4o handles user queries and natural dialogue for a seamless chat experience. |
-| ☁️ **Cloud-Native Deployment** | Containerized with Docker and deployable on AWS ECS/Fargate for scalable serving. |
-
----
-
-## 🧱 Planned Architecture
-
-```plaintext
+🧩 Core Features
+Feature	Description
+🍔 Restaurant-Aware Search	Integrates with Spoonacular’s restaurant and menu item endpoints to retrieve real fast-food and chain options.
+🧬 Nutrition Intelligence	Automatically analyzes and ranks meals based on macronutrients, calories, and dietary constraints.
+🧠 RAG-Based Question Answering	Uses semantic retrieval to ground LLM responses in factual nutrition and menu data.
+🌍 Cuisine-Aware Personalization	Routes queries to cuisine-specific prompt templates for contextually appropriate recommendations.
+💬 Conversational AI Interface	GPT-4o handles multi-constraint reasoning and natural dialogue.
+☁️ Cloud-Native Deployment	Containerized with Docker and deployable on AWS ECS/Fargate for scalable serving.
+🧱 Planned Architecture
 backend/
-├── app.py                    # FastAPI / Flask backend entrypoint
+├── app.py                    # FastAPI backend entrypoint
 ├── api/                      # API routing layer
 │   ├── routes.py
 │   └── __init__.py
 ├── services/                 # External service integrations
 │   ├── spoonacular_api.py
-│   ├── openai_service.py
+│   ├── llm_service.py
 │   └── __init__.py
 ├── database/                 # Data ingestion & query logic
 │   ├── db.py
@@ -59,95 +58,94 @@ backend/
 │   ├── embeddings.py
 │   ├── retriever.py
 │   └── pipeline.py
-├── fine_tune/                # Fine-tuning scripts & examples
-│   ├── prepare_dataset.py
-│   ├── upload_and_train.py
-│   └── examples/
+├── evaluation/               # Retrieval + response evaluation
+│   ├── metrics.py
+│   └── benchmarks.py
 ├── utils/                    # Helper functions
 │   ├── preprocess.py
 │   └── helpers.py
 └── tests/                    # Unit and integration tests
     └── test_api.py
-```
 
-## 🔍 System Design
+🔍 System Design
+1️⃣ Data Layer
 
-### 1️⃣ Data Layer
-- Pulls real-time menu and nutrition data from **Spoonacular API**  
-- Normalizes and stores it in a local or cloud database (**SQLite → PostgreSQL/RDS**)  
-- Enriches data with embeddings for retrieval (**Weaviate**)
+Pulls real-time menu and nutrition data from the Spoonacular API
 
-### 2️⃣ RAG Pipeline
-- User queries are vectorized and matched against stored embeddings  
-- Retrieved context is combined with **GPT-4o** prompt templates  
-- GPT synthesizes structured + unstructured information into natural answers
+Normalizes and stores data in a local or cloud database (SQLite → PostgreSQL/RDS)
 
-### 3️⃣ Fine-Tuning Layer
-- **GPT-3.5** models are fine-tuned per cuisine domain *(Asian, Mexican, Fast Food, etc.)*  
-- Fine-tuned models can be dynamically selected based on cuisine classification of the query
+Enriches menu items with embeddings for semantic retrieval (Weaviate)
 
-### 4️⃣ Deployment Layer
-- Packaged via **Docker**  
-- Deployable to **AWS ECS/Fargate** or **Lambda (serverless option)**  
-- **S3** for data/artifact storage, **CloudWatch** for logs/metrics
+2️⃣ RAG Pipeline
 
----
+User queries are embedded and matched against stored menu embeddings
 
-## 🧮 Example Query Flow
+Top-k retrieved menu items are injected into GPT-4o prompt templates
 
-**User:**  
-> “I want a low-carb dinner from a fast-food place.”
+GPT synthesizes responses grounded in retrieved nutritional context
 
-**RAG Retriever:**  
-Fetches relevant menu items from Spoonacular (low-carb tagged)
+This design significantly reduces hallucinated nutrition facts compared to a prompt-only LLM baseline.
 
-**GPT-4o Reasoning:**  
-Filters by location, taste profile, and dietary rules
+3️⃣ Personalization & Model Strategy
 
-**Response:**  
-> “Try *Grilled Chicken Salad* from Chick-fil-A — only **8g net carbs** and **320 calories**.”
+Uses prompt routing based on inferred cuisine and dietary intent
 
----
+Explores lightweight fine-tuning and prompt variants as an experimental comparison, not a core dependency
 
-## 🧰 Tech Stack
+Prioritizes retrieval quality and prompt structure over heavy model specialization
 
-| Layer | Tools |
-|-------|-------|
-| **Backend** | Python, FastAPI |
-| **Model Serving** | OpenAI GPT-4o, GPT-3.5 |
-| **Data Ingestion** | Spoonacular API, Pandas |
-| **Database** | SQLite / PostgreSQL |
-| **Vector Store** | Weaviate |
-| **Retrieval Augmented Generation** | LlamaIndex |
-| **MLOps / Deployment** | Docker, AWS ECS/Fargate, S3, CloudWatch |
-| **Version Control** | Git + GitHub Actions (CI/CD planned) |
+4️⃣ Deployment Layer
 
----
+Packaged via Docker for reproducible builds
 
-## 🧑‍🍳 Future Enhancements
-- 🤖 AI Agent integration (Restaurant Locator Agent, Ordering Agent)
-- 🔁 Continuous fine-tuning pipeline using real user feedback  
-- 🧠 User preference memory for long-term personalization  
-- 📊 Evaluation dashboard comparing base GPT-4o vs fine-tuned GPT-3.5 responses  
-- 💬 Multi-turn dialogue state management for richer conversations  
+Deployable to AWS ECS/Fargate or Lambda (serverless option)
 
----
+S3 for data/artifact storage, CloudWatch for logs and metrics
 
-## 🚀 Deployment Plan
+🧮 Example Query Flow
 
-| Stage | Goal |
-|--------|------|
-| **Phase 1** | Local development, Spoonacular ingestion, simple RAG prototype |
-| **Phase 2** | GPT-4o integration + API deployment via FastAPI |
-| **Phase 3** | Fine-tune GPT-3.5 models by cuisine type |
-| **Phase 4** | Containerize and deploy to AWS ECS |
-| **Phase 5** | Add automated tests and CI/CD workflow |
+User:
 
----
+“I want a low-carb dinner from a fast-food place.”
 
-## 📦 Installation (Planned)
+RAG Retriever:
+Fetches relevant low-carb menu items from Spoonacular embeddings
 
-```bash
+GPT-4o Reasoning:
+Applies dietary constraints, ranking logic, and preference filters
+
+Response:
+
+“Try Grilled Chicken Salad from Chick-fil-A — approximately 8g net carbs and 320 calories.”
+
+🧰 Tech Stack
+Layer	Tools
+Backend	Python, FastAPI
+Model Serving	OpenAI GPT-4o
+Data Ingestion	Spoonacular API, Pandas
+Database	SQLite / PostgreSQL
+Vector Store	Weaviate
+Retrieval Augmented Generation	LlamaIndex
+MLOps / Deployment	Docker, AWS ECS/Fargate, S3, CloudWatch
+Version Control	Git + GitHub Actions
+🧑‍🍳 Future Enhancements
+
+🤖 Agent-based extensions (restaurant lookup, ordering workflows)
+
+🧠 Long-term user preference memory
+
+📊 Expanded evaluation dashboard for retrieval quality and response correctness
+
+💬 Improved multi-turn dialogue state tracking
+
+🚀 Deployment Plan
+Stage	Goal
+Phase 1	Local development, Spoonacular ingestion, RAG prototype
+Phase 2	GPT-4o integration + API deployment via FastAPI
+Phase 3	Evaluation pipeline and prompt routing
+Phase 4	Containerize and deploy to AWS ECS
+Phase 5	Add automated tests and CI/CD workflow
+📦 Installation (Planned)
 # Clone the repo
 git clone https://github.com/<yourusername>/TasteIQ
 cd TasteIQ/backend
