@@ -44,34 +44,33 @@ TasteIQ demonstrates how **RAG-based GenAI systems** can bridge structured data 
 
 > **Codebase-level view of the system**
 
+```text
 backend/
-├── app.py # FastAPI entrypoint
-├── api/ # API routing
-│ ├── routes.py
-│ └── init.py
-├── services/ # External integrations
-│ ├── spoonacular_api.py
-│ ├── llm_service.py
-│ └── init.py
-├── database/ # Data ingestion & queries
-│ ├── db.py
-│ ├── ingest_data.py
-│ └── queries.py
-├── rag/ # RAG pipeline
-│ ├── embeddings.py
-│ ├── retriever.py
-│ └── pipeline.py
-├── evaluation/ # Retrieval + response evaluation
-│ ├── metrics.py
-│ └── benchmarks.py
+├── app.py                    # FastAPI entrypoint
+├── api/                      # API routing
+│   ├── routes.py
+│   └── __init__.py
+├── services/                 # External integrations
+│   ├── spoonacular_api.py
+│   ├── llm_service.py
+│   └── __init__.py
+├── database/                 # Data ingestion & queries
+│   ├── db.py
+│   ├── ingest_data.py
+│   └── queries.py
+├── rag/                      # RAG pipeline
+│   ├── embeddings.py
+│   ├── retriever.py
+│   └── pipeline.py
+├── evaluation/               # Retrieval + response eval
+│   ├── metrics.py
+│   └── benchmarks.py
 ├── utils/
-│ ├── preprocess.py
-│ └── helpers.py
+│   ├── preprocess.py
+│   └── helpers.py
 └── tests/
-└── test_api.py
-
-markdown
-Copy code
+    └── test_api.py
+```
 
 ---
 
