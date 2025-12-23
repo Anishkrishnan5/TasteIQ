@@ -71,57 +71,50 @@ backend/
 └── tests/
     └── test_api.py
 ```
-🔍 System Design
-End-to-end system behavior and data flow
+---
 
-1️⃣ Data Layer
-Pulls menu and nutrition data from Spoonacular
 
-Normalizes and stores data (SQLite → PostgreSQL/RDS)
+## 🔍 System Design
 
-Generates embeddings for semantic retrieval (Weaviate)
+_End-to-end system behavior and data flow_
 
-2️⃣ RAG Pipeline
-User queries are embedded
+### 1️⃣ Data Layer
+- Pulls menu and nutrition data from **Spoonacular**
+- Normalizes and stores data (**SQLite → PostgreSQL / RDS**)
+- Generates embeddings for semantic retrieval (**Weaviate**)
 
-Top-k relevant menu items are retrieved
+### 2️⃣ RAG Pipeline
+- User queries are embedded
+- Top-k relevant menu items are retrieved via vector search
+- Retrieved context is injected into **GPT-4o** prompts
+- Responses are grounded in factual nutrition data
 
-Retrieved context is injected into GPT-4o prompts
+### 3️⃣ Personalization Strategy
+- Prompt routing based on inferred cuisine and dietary intent
+- Lightweight fine-tuning explored experimentally
+- Emphasis on retrieval quality over model specialization
 
-Responses are grounded in factual nutrition data
+### 4️⃣ Deployment Layer
+- Dockerized backend
+- Deployable via **AWS ECS / Fargate** or **Lambda**
+- **S3** for artifacts, **CloudWatch** for logging
 
-3️⃣ Personalization Strategy
-Prompt routing based on inferred cuisine and dietary intent
+---
 
-Lightweight fine-tuning explored experimentally
+## 🧮 Example Query Flow
 
-Emphasis on retrieval quality over model specialization
-
-4️⃣ Deployment Layer
-Dockerized backend
-
-Deployable via AWS ECS/Fargate or Lambda
-
-S3 for artifacts, CloudWatch for logging
-
-🧮 Example Query Flow
-User
-
-text
-Copy code
+### **User**
+```text
 I want a low-carb dinner from a fast-food place.
 Retriever
-
 text
 Copy code
 Fetches low-carb menu items via vector search
 LLM Reasoning
-
 text
 Copy code
 Applies dietary constraints and ranking logic
 Response
-
 text
 Copy code
 Try Grilled Chicken Salad from Chick-fil-A — ~8g net carbs, 320 calories.
@@ -143,7 +136,7 @@ Long-term user preference memory
 
 Evaluation dashboard for retrieval quality
 
-Improved multi-turn dialogue state
+Improved multi-turn dialogue state tracking
 
 🚀 Deployment Plan
 Phase	Goal
