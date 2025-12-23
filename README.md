@@ -70,6 +70,7 @@ backend/
 │   └── helpers.py
 └── tests/
     └── test_api.py
+```
 🔍 System Design
 End-to-end system behavior and data flow
 
