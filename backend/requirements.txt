@@ -36,3 +36,4 @@ numpy
 tiktoken
 python-dotenv
 requests
+pydantic-settings

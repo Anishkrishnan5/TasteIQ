@@ -1,15 +1,11 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+
 from core.config import settings
+from core.errors import BadRequestError
+from api.routes import router
 
 
-# ---------- Custom Exception ----------
-class BadRequestError(Exception):
-    def __init__(self, message: str):
-        self.message = message
-
-
-# ---------- App Factory ----------
 def create_app():
     app = FastAPI(title=settings.app_name)
 
@@ -21,12 +17,8 @@ def create_app():
             content={"error": exc.message}
         )
 
-    # ---- Test Route ----
-    @app.get("/test-error")
-    def test_error(q: int):
-        if q < 0:
-            raise BadRequestError("q must be non-negative")
-        return {"q": q}
+    # ---- Register Routes ----
+    app.include_router(router)
 
     return app
 
