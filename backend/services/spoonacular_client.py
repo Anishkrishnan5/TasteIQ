@@ -4,12 +4,13 @@ import json
 
 API_KEY = os.getenv("SPOONACULAR_API_KEY")
 
-def fetch_menu_items():
+def fetch_menu_items(query, offset=0, number=10):
     url = "https://api.spoonacular.com/food/menuItems/search"
     params = {
         "apiKey": API_KEY,
-        "query": "burger",
-        "number": 3
+        "query": query,
+        "offset": offset,
+        "number": number
     }
 
     response = requests.get(url, params=params)
