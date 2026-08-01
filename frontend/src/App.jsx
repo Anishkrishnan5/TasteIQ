@@ -53,11 +53,13 @@ function App() {
             <div className="number">{String(index + 1).padStart(2, '0')}</div>
             <h3>{item.name}</h3>
             <p>{item.restaurant || 'Menu item'}</p>
-            <div className="facts">
-              {item.calories != null && <span>{Math.round(item.calories)} cal</span>}
-              {item.protein_g != null && <span>{Math.round(item.protein_g)}g protein</span>}
-              {(item.derived_tags || []).slice(0, 2).map((tag) => <span key={tag}>{tag.replaceAll('_', ' ')}</span>)}
+            <div className="macros">
+              <div><strong>{item.calories != null ? Math.round(item.calories) : '—'}</strong><span>Calories</span></div>
+              <div><strong>{item.protein_g != null ? `${Math.round(item.protein_g)}g` : '—'}</strong><span>Protein</span></div>
+              <div><strong>{item.carbs_g != null ? `${Math.round(item.carbs_g)}g` : '—'}</strong><span>Carbs</span></div>
+              <div><strong>{item.fat_g != null ? `${Math.round(item.fat_g)}g` : '—'}</strong><span>Fat</span></div>
             </div>
+            <div className="ingredients"><strong>Ingredients</strong><p>{item.ingredients?.length ? item.ingredients.join(', ') : 'Not provided by the menu source.'}</p></div>
           </article>
         ))}</div>
       </section>}

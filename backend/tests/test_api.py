@@ -26,3 +26,12 @@ def test_recommendations():
 def test_recommendations_validate_input():
     response = client.post("/api/recommendations", json={"query": ""})
     assert response.status_code == 422
+
+
+def test_recommendations_include_macro_fields():
+    response = client.post("/api/recommendations", json={"query": "chicken", "limit": 10})
+    results = response.json()["results"]
+    assert any(item["calories"] is not None for item in results)
+    enriched = next(item for item in results if item["calories"] is not None)
+    assert all(key in enriched for key in ("protein_g", "carbs_g", "fat_g", "ingredients"))
+    assert len({item["spoonacular_id"] for item in results}) == len(results)
