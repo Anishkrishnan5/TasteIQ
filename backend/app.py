@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 from core.config import settings
 from core.errors import BadRequestError
@@ -8,6 +9,13 @@ from api.routes import router
 
 def create_app():
     app = FastAPI(title=settings.app_name)
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=[settings.frontend_origin],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
     # ---- Exception Handler ----
     @app.exception_handler(BadRequestError)

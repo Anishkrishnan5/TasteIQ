@@ -1,10 +1,11 @@
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=".env")
+
     app_name: str = "TasteIQ"
     debug: bool = True
-
-    class Config:
-        env_file = ".env"
+    frontend_origin: str = "http://localhost:5173"
+    rag_data_path: str | None = None
 
 settings = Settings()
