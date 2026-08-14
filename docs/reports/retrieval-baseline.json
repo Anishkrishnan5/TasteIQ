@@ -1,0 +1,116 @@
+{
+  "report_version": 1,
+  "baseline": "deterministic token overlap with SQLite enrichment",
+  "fixture_version": 1,
+  "methodology": {
+    "warm_cache": true,
+    "repetitions_per_query": 100,
+    "concurrency": 1,
+    "timed_scope": "search_menu call only",
+    "latency_warning": "Local development measurement; not a production SLO claim."
+  },
+  "environment": {
+    "python": "3.12.12",
+    "platform": "macOS-14.5-arm64-arm-64bit",
+    "processor": "arm"
+  },
+  "artifacts": {
+    "fixture": "backend/tests/fixtures/retrieval_baseline.json",
+    "fixture_sha256": "12e21d1a2ac7e37fd8afa00b40524cf431268218599f117766fe5d9d914d6bb5",
+    "catalog": "database/rag_items.jsonl",
+    "catalog_sha256": "9596c4fbc2928a33107fcf98f66853cb28913101af04081485bf5ebfae1572c6",
+    "catalog_records": 920
+  },
+  "summary": {
+    "cases": 6,
+    "snapshot_top_result_matches": 6,
+    "all_snapshot_matches": true,
+    "median_query_p95_ms": 2.02
+  },
+  "cases": [
+    {
+      "query": "chicken",
+      "limit": 5,
+      "result_count": 5,
+      "top_spoonacular_id": 306973,
+      "expected_top_spoonacular_id": 306973,
+      "top_result_matches_snapshot": true,
+      "known_defect": null,
+      "latency_ms": {
+        "median": 2.027,
+        "p95": 2.722,
+        "max": 6.979
+      }
+    },
+    {
+      "query": "burger",
+      "limit": 5,
+      "result_count": 5,
+      "top_spoonacular_id": 368408,
+      "expected_top_spoonacular_id": 368408,
+      "top_result_matches_snapshot": true,
+      "known_defect": null,
+      "latency_ms": {
+        "median": 1.794,
+        "p95": 1.931,
+        "max": 2.842
+      }
+    },
+    {
+      "query": "salad",
+      "limit": 5,
+      "result_count": 5,
+      "top_spoonacular_id": 269545,
+      "expected_top_spoonacular_id": 269545,
+      "top_result_matches_snapshot": true,
+      "known_defect": null,
+      "latency_ms": {
+        "median": 1.768,
+        "p95": 1.948,
+        "max": 2.518
+      }
+    },
+    {
+      "query": "pizza",
+      "limit": 5,
+      "result_count": 5,
+      "top_spoonacular_id": 374803,
+      "expected_top_spoonacular_id": 374803,
+      "top_result_matches_snapshot": true,
+      "known_defect": null,
+      "latency_ms": {
+        "median": 1.788,
+        "p95": 1.886,
+        "max": 2.972
+      }
+    },
+    {
+      "query": "spicy dinner",
+      "limit": 5,
+      "result_count": 5,
+      "top_spoonacular_id": 389571,
+      "expected_top_spoonacular_id": 389571,
+      "top_result_matches_snapshot": true,
+      "known_defect": null,
+      "latency_ms": {
+        "median": 1.804,
+        "p95": 2.092,
+        "max": 2.982
+      }
+    },
+    {
+      "query": "zzzxxyy",
+      "limit": 5,
+      "result_count": 5,
+      "top_spoonacular_id": 306973,
+      "expected_top_spoonacular_id": 306973,
+      "top_result_matches_snapshot": true,
+      "known_defect": "Nutrition-presence bonus admits unrelated zero-overlap results.",
+      "latency_ms": {
+        "median": 1.793,
+        "p95": 2.445,
+        "max": 22.24
+      }
+    }
+  ]
+}

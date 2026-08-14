@@ -1,0 +1,117 @@
+{
+  "report_version": 1,
+  "source": {
+    "provider": "Spoonacular historical snapshot",
+    "catalog_role": "checked-in runtime retrieval catalog",
+    "database_role": "checked-in optional runtime enrichment",
+    "provenance_limitations": [
+      "The original fetch timestamp and request parameters are not recorded per catalog row.",
+      "The snapshot does not include a versioned source manifest."
+    ]
+  },
+  "catalog": {
+    "path": "backend/database/rag_items.jsonl",
+    "sha256": "9596c4fbc2928a33107fcf98f66853cb28913101af04081485bf5ebfae1572c6",
+    "total_lines": 920,
+    "valid_records": 920,
+    "malformed_json": {
+      "count": 0,
+      "line_numbers": []
+    },
+    "non_object_json": {
+      "count": 0,
+      "line_numbers": []
+    },
+    "missing_required_structure": {
+      "id": 0,
+      "spoonacular_id": 0,
+      "metadata_object": 0,
+      "name": 0
+    },
+    "duplicates": {
+      "id": {
+        "groups": 430,
+        "extra_rows": 490
+      },
+      "spoonacular_id": {
+        "groups": 460,
+        "extra_rows": 460
+      },
+      "normalized_name": {
+        "groups": 430,
+        "extra_rows": 490
+      }
+    },
+    "unique": {
+      "id": 430,
+      "spoonacular_id": 460,
+      "normalized_name": 430
+    },
+    "metadata_coverage": {
+      "name": {
+        "known": 920,
+        "percent": 100.0
+      },
+      "restaurant": {
+        "known": 0,
+        "percent": 0.0
+      },
+      "cuisine": {
+        "known": 0,
+        "percent": 0.0
+      },
+      "ingredients": {
+        "known": 0,
+        "percent": 0.0
+      },
+      "diet_tags": {
+        "known": 0,
+        "percent": 0.0
+      },
+      "derived_tags": {
+        "known": 0,
+        "percent": 0.0
+      },
+      "calories": {
+        "known": 0,
+        "percent": 0.0
+      },
+      "protein_g": {
+        "known": 0,
+        "percent": 0.0
+      },
+      "carbs_g": {
+        "known": 0,
+        "percent": 0.0
+      },
+      "fat_g": {
+        "known": 0,
+        "percent": 0.0
+      }
+    }
+  },
+  "database": {
+    "path": "backend/database/tasteiq.db",
+    "sha256": "fd58d044e2d376fe7148e09dd0054781806266815d6a9c4f391b7329d11c2e30",
+    "tables": [
+      "menu_item_details",
+      "raw_menu_items",
+      "sqlite_sequence"
+    ],
+    "raw_menu_items": 920,
+    "menu_item_details": 51,
+    "invalid_detail_payloads": 0
+  },
+  "runtime_enrichment": {
+    "catalog_records_with_detail": 102,
+    "catalog_record_percent": 11.09,
+    "unique_source_ids_with_detail": 51,
+    "unique_source_id_percent": 11.09,
+    "unique_catalog_source_ids": 460
+  },
+  "quality_gate": {
+    "malformed_json_is_zero": true,
+    "all_records_have_ids": true,
+    "all_records_have_names": true
+  }
+}

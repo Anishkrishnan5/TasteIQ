@@ -3,7 +3,7 @@ BACKEND_VENV := backend/.venv
 BACKEND_PYTHON := $(BACKEND_VENV)/bin/python
 BACKEND_PIP := $(BACKEND_VENV)/bin/pip
 
-.PHONY: bootstrap check test lint typecheck build compose-check clean
+.PHONY: bootstrap check test lint typecheck build compose-check verify-reports reports clean
 
 bootstrap:
 	$(PYTHON) -m venv $(BACKEND_VENV)
@@ -11,7 +11,15 @@ bootstrap:
 	$(BACKEND_PIP) install -r backend/requirements-dev.txt
 	npm --prefix frontend ci
 
-check: lint typecheck test build compose-check
+check: lint typecheck test build compose-check verify-reports
+
+verify-reports:
+	cd backend && .venv/bin/python -m tools.data_report --check --output /tmp/tasteiq-data-quality.json
+	cd backend && .venv/bin/python -m tools.retrieval_baseline --repetitions 5 --output /tmp/tasteiq-retrieval-baseline.json
+
+reports:
+	cd backend && .venv/bin/python -m tools.data_report --check
+	cd backend && .venv/bin/python -m tools.retrieval_baseline
 
 test:
 	cd backend && .venv/bin/pytest

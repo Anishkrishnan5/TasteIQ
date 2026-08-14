@@ -105,6 +105,16 @@ make check
 
 The checked-in `backend/database/rag_items.jsonl` file is the current runtime catalog. Maintenance scripts ingest, normalize, and enrich menu data using the Spoonacular API; the current application runtime does not require an external API credential.
 
+Regenerate the checked-in data-quality and retrieval-baseline reports:
+
+```bash
+make reports
+```
+
+The reports under `docs/reports/` record artifact hashes, duplicate and metadata coverage, baseline
+query outputs, known retrieval defects, and local latency methodology. They are measurements of the
+current snapshot, not production performance claims.
+
 ## Project status
 
 TasteIQ is in the baseline phase. Near-term work focuses on repository cleanup, data quality, retrieval evaluation, PostgreSQL persistence, structured filters, CI, and runtime instrumentation. Advanced retrieval and systems optimization will be added against measured baselines.

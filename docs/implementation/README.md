@@ -29,7 +29,7 @@ Do not claim planned functionality as implemented. Measurements must identify th
 |---|---|---|
 | Phase 0A — Repository hygiene | Complete | [00-repository-hygiene.md](00-repository-hygiene.md) |
 | Phase 0B — Reproducible tooling | Complete | [01-reproducible-tooling.md](01-reproducible-tooling.md) |
-| Phase 0C — Baseline and data report | Planned | To be created with implementation |
+| Phase 0C — Baseline and data report | Complete | [02-baseline-and-data-report.md](02-baseline-and-data-report.md) |
 
 ## Relationship to other documentation
 
