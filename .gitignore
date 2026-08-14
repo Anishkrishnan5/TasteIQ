@@ -136,6 +136,24 @@ celerybeat.pid
 
 # Environments
 .env
+.env.*
+!.env.example
+
+# Operating system and editor files
+.DS_Store
+.vscode/
+.idea/
+
+# Generated retrieval artifacts
+*.index
+faiss_meta.json
+
+# Local databases and journals
+backend/tasteiq.db
+*.db-journal
+
+# Local build output
+frontend/dist/
 .envrc
 .venv
 env/

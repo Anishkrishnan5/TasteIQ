@@ -1,20 +1,21 @@
 import json
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 from database.db import get_connection
 from utils.preprocess import preprocess_menu_items
 
 OUT_PATH = Path(__file__).parent / "rag_items.jsonl"
 
-def load_raw_items() -> List[Dict[str, Any]]:
+
+def load_raw_items() -> list[dict[str, Any]]:
     conn = get_connection()
     cur = conn.cursor()
     cur.execute("SELECT spoonacular_id, payload FROM raw_menu_items")
     rows = cur.fetchall()
     conn.close()
 
-    raw_items: List[Dict[str, Any]] = []
+    raw_items: list[dict[str, Any]] = []
     bad = 0
 
     for r in rows:
@@ -35,6 +36,7 @@ def load_raw_items() -> List[Dict[str, Any]]:
     if bad:
         print(f"Warning: {bad} payload rows failed json.loads()")
     return raw_items
+
 
 def main():
     raw_items = load_raw_items()
@@ -64,6 +66,7 @@ def main():
             f.write(json.dumps(rec, ensure_ascii=False) + "\n")
 
     print(f"Wrote {len(cleaned)} cleaned items to {OUT_PATH}")
+
 
 if __name__ == "__main__":
     main()

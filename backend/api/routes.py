@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
+
 from core.errors import BadRequestError
 from rag.pipeline import recommend
 
@@ -12,10 +13,7 @@ def get_app_version():
 
 @router.get("/health")
 def health(version: str = Depends(get_app_version)):
-    return {
-        "status": "ok",
-        "version": version
-    }
+    return {"status": "ok", "version": version}
 
 
 class RecommendationRequest(BaseModel):

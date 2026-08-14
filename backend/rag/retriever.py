@@ -40,7 +40,9 @@ def load_details() -> dict[int, dict]:
     details = {}
     try:
         connection = sqlite3.connect(DEFAULT_DB_PATH)
-        rows = connection.execute("SELECT spoonacular_id, payload FROM menu_item_details").fetchall()
+        rows = connection.execute(
+            "SELECT spoonacular_id, payload FROM menu_item_details"
+        ).fetchall()
         connection.close()
     except sqlite3.Error:
         return {}
@@ -64,13 +66,19 @@ def load_details() -> dict[int, dict]:
     return details
 
 
-def search_menu(query: str, limit: int = 6, max_calories: float | None = None,
-                min_protein: float | None = None, diet: str | None = None) -> list[dict]:
+def search_menu(
+    query: str,
+    limit: int = 6,
+    max_calories: float | None = None,
+    min_protein: float | None = None,
+    diet: str | None = None,
+) -> list[dict]:
     query_tokens = _tokens(" ".join(filter(None, [query, diet or ""])))
     ranked = []
     for item in load_items():
         metadata = dict(item.get("metadata", {}))
-        detail = load_details().get(item.get("spoonacular_id"), {})
+        spoonacular_id = item.get("spoonacular_id")
+        detail = load_details().get(spoonacular_id, {}) if isinstance(spoonacular_id, int) else {}
         for key, value in detail.items():
             if value not in (None, "", []):
                 metadata[key] = value
@@ -80,13 +88,17 @@ def search_menu(query: str, limit: int = 6, max_calories: float | None = None,
             continue
         if min_protein is not None and protein is not None and protein < min_protein:
             continue
-        searchable = item.get("embedding_text", "") + " " + " ".join(metadata.get("derived_tags", []))
+        searchable = (
+            item.get("embedding_text", "") + " " + " ".join(metadata.get("derived_tags", []))
+        )
         overlap = len(query_tokens & _tokens(searchable))
         name_overlap = len(query_tokens & _tokens(metadata.get("name", "")))
         score = overlap + name_overlap * 1.5
         if calories is not None:
             score += 0.25
-        if diet and diet.replace("-", "_").lower() in metadata.get("diet_tags", []) + metadata.get("derived_tags", []):
+        if diet and diet.replace("-", "_").lower() in metadata.get("diet_tags", []) + metadata.get(
+            "derived_tags", []
+        ):
             score += 3
         if query_tokens and score == 0:
             continue
@@ -99,7 +111,13 @@ def search_menu(query: str, limit: int = 6, max_calories: float | None = None,
         if unique_id in seen:
             continue
         seen.add(unique_id)
-        metadata.update({"id": item.get("id"), "spoonacular_id": item.get("spoonacular_id"), "score": round(score, 2)})
+        metadata.update(
+            {
+                "id": item.get("id"),
+                "spoonacular_id": item.get("spoonacular_id"),
+                "score": round(score, 2),
+            }
+        )
         results.append(metadata)
         if len(results) == limit:
             break

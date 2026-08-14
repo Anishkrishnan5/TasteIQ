@@ -1,8 +1,9 @@
-import sqlite3
-import requests
-import time
 import json
 import os
+import sqlite3
+import time
+
+import requests
 
 API_KEY = os.getenv("SPOONACULAR_API_KEY")
 DB_PATH = "database/tasteiq.db"
@@ -35,11 +36,14 @@ for menu_id in ids:
         print(f"❌ Failed {menu_id}: {r.status_code}")
         continue
 
-    cursor.execute("""
+    cursor.execute(
+        """
         INSERT OR REPLACE INTO menu_item_details
         (spoonacular_id, payload)
         VALUES (?, ?)
-    """, (menu_id, json.dumps(r.json())))
+    """,
+        (menu_id, json.dumps(r.json())),
+    )
 
     conn.commit()
     time.sleep(0.3)

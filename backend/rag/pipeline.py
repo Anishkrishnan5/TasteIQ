@@ -1,8 +1,13 @@
 from rag.retriever import search_menu
 
 
-def recommend(query: str, limit: int = 6, max_calories: float | None = None,
-              min_protein: float | None = None, diet: str | None = None) -> dict:
+def recommend(
+    query: str,
+    limit: int = 6,
+    max_calories: float | None = None,
+    min_protein: float | None = None,
+    diet: str | None = None,
+) -> dict:
     items = search_menu(query, limit, max_calories, min_protein, diet)
     if items:
         names = ", ".join(item["name"].title() for item in items[:3])

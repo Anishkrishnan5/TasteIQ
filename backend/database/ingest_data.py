@@ -1,6 +1,7 @@
 import json
 import time
-from database.db import init_db, get_connection
+
+from database.db import get_connection, init_db
 from services.spoonacular_client import fetch_menu_items
 
 QUERY = "chicken"
@@ -8,11 +9,12 @@ PAGE_SIZE = 10
 MAX_PAGES = 200
 SLEEP_SECONDS = 1.5
 
+
 def ingest():
     init_db()
     conn = get_connection()
     cursor = conn.cursor()
-    
+
     offset = 0
     page = 0
 
@@ -26,10 +28,13 @@ def ingest():
             print(f"No items found for page {page}, stopping ingestion.")
             break
         for item in items:
-            cursor.execute("""
+            cursor.execute(
+                """
                 INSERT INTO raw_menu_items (spoonacular_id, payload)
                 VALUES (?, ?)
-            """, (item.get("id"), json.dumps(item)))
+            """,
+                (item.get("id"), json.dumps(item)),
+            )
         conn.commit()
         offset += PAGE_SIZE
         page += 1
@@ -39,6 +44,7 @@ def ingest():
 
     conn.close()
     print("Ingestion complete.")
+
 
 if __name__ == "__main__":
     ingest()

@@ -2,8 +2,9 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any
 
 # ---------------------------
 # Canonicalization helpers
@@ -13,8 +14,21 @@ _WORD_RE = re.compile(r"[^a-z0-9\s,./+-]")  # keep basic separators
 _WS_RE = re.compile(r"\s+")
 
 FILLER_WORDS = {
-    "fresh", "organic", "homemade", "house", "housemade", "signature", "classic",
-    "delicious", "tasty", "served", "with", "and", "style", "chef", "choice"
+    "fresh",
+    "organic",
+    "homemade",
+    "house",
+    "housemade",
+    "signature",
+    "classic",
+    "delicious",
+    "tasty",
+    "served",
+    "with",
+    "and",
+    "style",
+    "chef",
+    "choice",
 }
 
 # Lightweight synonym map you can grow over time
@@ -63,7 +77,8 @@ DIET_TAG_CANON = {
     "high-protein": "high_protein",
 }
 
-def clean_text(s: Optional[str]) -> str:
+
+def clean_text(s: str | None) -> str:
     """Lowercase + strip + remove weird chars + normalize whitespace."""
     if not s:
         return ""
@@ -72,11 +87,12 @@ def clean_text(s: Optional[str]) -> str:
     s = _WS_RE.sub(" ", s).strip()
     return s
 
-def to_float(x: Any) -> Optional[float]:
+
+def to_float(x: Any) -> float | None:
     """Parse numbers robustly; returns None if missing/unparseable."""
     if x is None:
         return None
-    if isinstance(x, (int, float)):
+    if isinstance(x, int | float):
         # guard against NaN
         try:
             if x != x:  # NaN
@@ -93,18 +109,21 @@ def to_float(x: Any) -> Optional[float]:
         return float(m.group(0)) if m else None
     return None
 
-def clamp_nonneg(x: Optional[float]) -> Optional[float]:
+
+def clamp_nonneg(x: float | None) -> float | None:
     if x is None:
         return None
     return max(0.0, x)
 
-def normalize_cuisine(c: Optional[str]) -> str:
+
+def normalize_cuisine(c: str | None) -> str:
     c = clean_text(c)
     if not c:
         return ""
     return CUISINE_MAP.get(c, c)
 
-def normalize_diet_tags(tags: Any) -> List[str]:
+
+def normalize_diet_tags(tags: Any) -> list[str]:
     """
     Accepts list/str/None.
     Outputs stable snake_case tags like ['vegan','gluten_free'].
@@ -113,12 +132,12 @@ def normalize_diet_tags(tags: Any) -> List[str]:
         return []
     if isinstance(tags, str):
         raw = [t.strip() for t in re.split(r"[;,/|]+", tags) if t.strip()]
-    elif isinstance(tags, (list, tuple)):
+    elif isinstance(tags, list | tuple):
         raw = [str(t) for t in tags if t is not None]
     else:
         raw = [str(tags)]
 
-    out: List[str] = []
+    out: list[str] = []
     for t in raw:
         t2 = clean_text(t)
         if not t2:
@@ -128,6 +147,7 @@ def normalize_diet_tags(tags: Any) -> List[str]:
 
     # de-dupe, stable
     return sorted(set(out))
+
 
 def normalize_ingredient(i: str) -> str:
     i = clean_text(i)
@@ -158,7 +178,8 @@ def normalize_ingredient(i: str) -> str:
 
     return i
 
-def normalize_ingredients(ingredients: Any) -> List[str]:
+
+def normalize_ingredients(ingredients: Any) -> list[str]:
     """
     Accepts list/str/None.
     Spoonacular sometimes returns free text; we try to split safely.
@@ -167,7 +188,7 @@ def normalize_ingredients(ingredients: Any) -> List[str]:
         return []
     if isinstance(ingredients, str):
         raw = [t.strip() for t in re.split(r"[;,/|]+", ingredients) if t.strip()]
-    elif isinstance(ingredients, (list, tuple)):
+    elif isinstance(ingredients, list | tuple):
         raw = [str(t) for t in ingredients if t is not None]
     else:
         raw = [str(ingredients)]
@@ -176,17 +197,18 @@ def normalize_ingredients(ingredients: Any) -> List[str]:
     out = [x for x in out if x]
     return sorted(set(out))
 
+
 def compute_derived_tags(
-    calories: Optional[float],
-    protein_g: Optional[float],
-    carbs_g: Optional[float],
-    fat_g: Optional[float],
-) -> List[str]:
+    calories: float | None,
+    protein_g: float | None,
+    carbs_g: float | None,
+    fat_g: float | None,
+) -> list[str]:
     """
     Cheap heuristics to help retrieval.
     These are not medical rules—just retrieval cues.
     """
-    tags: List[str] = []
+    tags: list[str] = []
     if calories is not None:
         if calories <= 500:
             tags.append("under_500_cal")
@@ -204,6 +226,7 @@ def compute_derived_tags(
 
     return tags
 
+
 def stable_item_id(restaurant: str, name: str) -> str:
     """
     Deterministic id helps de-duping and vector upserts.
@@ -212,7 +235,8 @@ def stable_item_id(restaurant: str, name: str) -> str:
     base = clean_text(base).replace(" ", "_")
     return base[:200]  # avoid silly-long ids
 
-def build_embedding_text(record: Dict[str, Any]) -> str:
+
+def build_embedding_text(record: dict[str, Any]) -> str:
     """
     This is what you embed.
     Keep it dense, factual, consistent.
@@ -230,7 +254,9 @@ def build_embedding_text(record: Dict[str, Any]) -> str:
     fat = record.get("fat_g")
 
     ing_txt = ", ".join(ingredients) if ingredients else ""
-    tag_txt = ", ".join(sorted(set(diet_tags + derived_tags))) if (diet_tags or derived_tags) else ""
+    tag_txt = (
+        ", ".join(sorted(set(diet_tags + derived_tags))) if (diet_tags or derived_tags) else ""
+    )
 
     # Use short key:value lines. This embeds well and is easy to inspect.
     lines = [
@@ -246,9 +272,11 @@ def build_embedding_text(record: Dict[str, Any]) -> str:
     ]
     return "\n".join([ln for ln in lines if ln]).strip()
 
+
 # ---------------------------
 # Public pipeline
 # ---------------------------
+
 
 @dataclass
 class CleanedMenuItem:
@@ -256,17 +284,18 @@ class CleanedMenuItem:
     name: str
     restaurant: str
     cuisine: str
-    ingredients: List[str]
-    diet_tags: List[str]
-    derived_tags: List[str]
-    calories: Optional[float]
-    protein_g: Optional[float]
-    carbs_g: Optional[float]
-    fat_g: Optional[float]
+    ingredients: list[str]
+    diet_tags: list[str]
+    derived_tags: list[str]
+    calories: float | None
+    protein_g: float | None
+    carbs_g: float | None
+    fat_g: float | None
     embedding_text: str
-    raw_source: Dict[str, Any]  # keep for debugging
+    raw_source: dict[str, Any]  # keep for debugging
 
-def clean_one_menu_item(raw: Dict[str, Any]) -> Optional[CleanedMenuItem]:
+
+def clean_one_menu_item(raw: dict[str, Any]) -> CleanedMenuItem | None:
     """
     Map your raw Spoonacular-ish dict into a cleaned, RAG-ready record.
     Adjust field names here to match your ingested schema.
@@ -276,16 +305,22 @@ def clean_one_menu_item(raw: Dict[str, Any]) -> Optional[CleanedMenuItem]:
     if not name:
         return None
 
-    restaurant = clean_text(raw.get("restaurant") or raw.get("restaurant_name") or raw.get("brand") or "")
+    restaurant = clean_text(
+        raw.get("restaurant") or raw.get("restaurant_name") or raw.get("brand") or ""
+    )
     cuisine = normalize_cuisine(raw.get("cuisine") or raw.get("cuisines") or "")
 
-    ingredients = normalize_ingredients(raw.get("ingredients") or raw.get("ingredientList") or raw.get("ingredient_list"))
+    ingredients = normalize_ingredients(
+        raw.get("ingredients") or raw.get("ingredientList") or raw.get("ingredient_list")
+    )
     diet_tags = normalize_diet_tags(raw.get("dietary_tags") or raw.get("diets") or raw.get("tags"))
 
     # ---- Nutrition fields (try common variants) ----
     calories = clamp_nonneg(to_float(raw.get("calories") or raw.get("kcal")))
     protein_g = clamp_nonneg(to_float(raw.get("protein") or raw.get("protein_g")))
-    carbs_g = clamp_nonneg(to_float(raw.get("carbs") or raw.get("carbohydrates") or raw.get("carbs_g")))
+    carbs_g = clamp_nonneg(
+        to_float(raw.get("carbs") or raw.get("carbohydrates") or raw.get("carbs_g"))
+    )
     fat_g = clamp_nonneg(to_float(raw.get("fat") or raw.get("fat_g")))
 
     derived_tags = compute_derived_tags(calories, protein_g, carbs_g, fat_g)
@@ -323,12 +358,15 @@ def clean_one_menu_item(raw: Dict[str, Any]) -> Optional[CleanedMenuItem]:
         raw_source=raw,
     )
 
-def preprocess_menu_items(raw_items: Iterable[Dict[str, Any]]) -> Tuple[List[CleanedMenuItem], Dict[str, int]]:
+
+def preprocess_menu_items(
+    raw_items: Iterable[dict[str, Any]],
+) -> tuple[list[CleanedMenuItem], dict[str, int]]:
     """
     Cleans an iterable of raw items.
     Returns (clean_items, stats).
     """
-    out: List[CleanedMenuItem] = []
+    out: list[CleanedMenuItem] = []
     stats = {
         "seen": 0,
         "kept": 0,

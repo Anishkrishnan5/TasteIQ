@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env")
 
@@ -7,5 +8,6 @@ class Settings(BaseSettings):
     debug: bool = True
     frontend_origin: str = "http://localhost:5173"
     rag_data_path: str | None = None
+
 
 settings = Settings()
