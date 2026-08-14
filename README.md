@@ -116,6 +116,16 @@ The reports under `docs/reports/` record artifact hashes, duplicate and metadata
 query outputs, known retrieval defects, and local latency methodology. They are measurements of the
 current snapshot, not production performance claims.
 
+Run the versioned offline relevance evaluation independently:
+
+```bash
+make eval
+```
+
+The first judgment set contains 34 reviewed queries and reports Precision@5, Recall@10, MRR@10,
+nDCG@10, constraint violations, duplicate results, no-result accuracy, empty-result rate, and
+per-query rankings.
+
 ## Project status
 
 TasteIQ is in the baseline phase. Near-term work focuses on repository cleanup, data quality, retrieval evaluation, PostgreSQL persistence, structured filters, CI, and runtime instrumentation. Advanced retrieval and systems optimization will be added against measured baselines.

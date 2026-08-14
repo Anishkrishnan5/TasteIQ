@@ -95,7 +95,7 @@ JSON response
 - Runtime retrieval is token overlap rather than vector or hybrid search.
 - Natural-language constraints are not parsed into structured filters.
 - Calorie and protein filters are exposed; dietary metadata is not yet trustworthy enough to filter.
-- There is no formal relevance benchmark.
+- A first 34-query relevance benchmark exists; it remains small and single-reviewer.
 - There are no user accounts, profiles, or interaction events.
 - SQLite and JSONL are acting as runtime stores without migrations or provenance.
 - There is no cache, job queue, tracing, production deployment, or CI pipeline.

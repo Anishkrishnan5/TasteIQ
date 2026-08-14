@@ -31,6 +31,7 @@ Do not claim planned functionality as implemented. Measurements must identify th
 | Phase 0B — Reproducible tooling | Complete | [01-reproducible-tooling.md](01-reproducible-tooling.md) |
 | Phase 0C — Baseline and data report | Complete | [02-baseline-and-data-report.md](02-baseline-and-data-report.md) |
 | Phase 1 — Trustworthy data and API | Complete | [03-trustworthy-data-and-api.md](03-trustworthy-data-and-api.md) |
+| Phase 3A — Evaluation foundation | Complete | [04-evaluation-foundation.md](04-evaluation-foundation.md) |
 
 ## Relationship to other documentation
 
