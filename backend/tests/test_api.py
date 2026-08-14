@@ -8,7 +8,7 @@ client = TestClient(app)
 def test_health():
     response = client.get("/health")
     assert response.status_code == 200
-    assert response.json() == {"status": "ok", "version": "0.2.0"}
+    assert response.json() == {"status": "ok", "version": "0.3.0"}
     assert response.headers["x-request-id"]
     assert response.headers["server-timing"].startswith("total;dur=")
 
@@ -23,7 +23,7 @@ def test_recommendations():
     assert all("name" in item for item in body["results"])
     assert body["meta"]["result_count"] == len(body["results"])
     assert body["meta"]["request_id"] == response.headers["x-request-id"]
-    assert body["meta"]["retriever_version"] == "bm25-v1-k1.2-b0.0-name3"
+    assert body["meta"]["retriever_version"] == "bm25-v2-k1.2-b0.0-name3-spell0.86"
     assert len(body["meta"]["catalog_sha256"]) == 64
 
 
@@ -80,6 +80,16 @@ def test_unknown_query_returns_no_unrelated_results():
     response = client.post("/api/recommendations", json={"query": "zzzxxyy"})
     assert response.status_code == 200
     assert response.json()["results"] == []
+
+
+def test_close_misspelling_is_corrected_and_reported():
+    response = client.post("/api/recommendations", json={"query": "chiken"})
+    body = response.json()
+
+    assert response.status_code == 200
+    assert body["results"]
+    assert body["meta"]["normalized_query"] == "chicken"
+    assert body["meta"]["query_corrections"] == ["chiken->chicken"]
 
 
 def test_nutrition_filters_exclude_unknown_and_violating_values():

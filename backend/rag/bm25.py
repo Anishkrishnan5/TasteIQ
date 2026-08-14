@@ -3,12 +3,14 @@ from __future__ import annotations
 import math
 from collections import Counter
 from dataclasses import dataclass
+from difflib import get_close_matches
 from functools import lru_cache
 from typing import Any
 
-from rag.retriever import _tokens, load_details, load_items
+from rag.retriever import WORD_RE, _tokens, load_details, load_items
 
-BM25_VERSION = "bm25-v1-k1.2-b0.0-name3"
+BM25_BASELINE_VERSION = "bm25-v1-k1.2-b0.0-name3"
+BM25_VERSION = "bm25-v2-k1.2-b0.0-name3-spell0.86"
 K1 = 1.2
 B = 0.0
 NAME_WEIGHT = 3
@@ -26,6 +28,27 @@ class BM25Index:
     documents: list[IndexedDocument]
     document_frequencies: Counter[str]
     average_length: float
+
+
+def normalize_query(query: str, index: BM25Index, cutoff: float = 0.86) -> tuple[str, list[str]]:
+    vocabulary = index.document_frequencies.keys()
+    normalized = []
+    corrections = []
+    for term in WORD_RE.findall(query.lower()):
+        if term in index.document_frequencies or len(term) < 4:
+            normalized.append(term)
+            continue
+        bounded_vocabulary = (
+            candidate
+            for candidate in vocabulary
+            if candidate[0] == term[0] and candidate[-1] == term[-1]
+        )
+        match = get_close_matches(term, bounded_vocabulary, n=1, cutoff=cutoff)
+        replacement = match[0] if match else term
+        normalized.append(replacement)
+        if replacement != term:
+            corrections.append(f"{term}->{replacement}")
+    return " ".join(normalized), corrections
 
 
 def _document_tokens(item: dict[str, Any]) -> list[str]:
@@ -77,12 +100,15 @@ def search_menu_bm25(
     limit: int = 6,
     max_calories: float | None = None,
     min_protein: float | None = None,
+    *,
+    correct_misspellings: bool = True,
 ) -> list[dict[str, Any]]:
-    query_terms = _tokens(query)
+    index = build_index()
+    normalized_query = normalize_query(query, index)[0] if correct_misspellings else query
+    query_terms = _tokens(normalized_query)
     if not query_terms:
         return []
 
-    index = build_index()
     details = load_details()
     ranked = []
     for document in index.documents:
@@ -130,3 +156,18 @@ def search_menu_bm25(
         if len(results) == limit:
             break
     return results
+
+
+def search_menu_bm25_baseline(
+    query: str,
+    limit: int = 6,
+    max_calories: float | None = None,
+    min_protein: float | None = None,
+) -> list[dict[str, Any]]:
+    return search_menu_bm25(
+        query,
+        limit,
+        max_calories,
+        min_protein,
+        correct_misspellings=False,
+    )

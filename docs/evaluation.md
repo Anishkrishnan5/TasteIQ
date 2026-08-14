@@ -14,6 +14,19 @@ also runs the evaluation against minimum quality and safety thresholds.
 `make compare` regenerates the controlled BM25-versus-token-overlap comparison, including aggregate
 deltas, per-query wins/losses, warm-cache latency, cold index-build time, and incremental index memory.
 
+The optional ML workflow builds a pinned MiniLM index and compares dense and equal-weight reciprocal
+rank fusion against the same BM25 baseline:
+
+```bash
+make bootstrap-ml
+make embeddings
+make eval-ml
+make compare-ml
+```
+
+ML dependencies and generated vectors are separate from `make bootstrap` and `make check`. This keeps
+the default development and CI path small while preserving a reproducible semantic experiment.
+
 ## Current dataset
 
 The first version contains 34 cases:
@@ -27,7 +40,7 @@ The first version contains 34 cases:
 
 Judgments use a four-point scale: 0 is irrelevant, 1 is partially relevant, 2 is relevant, and 3 is
 highly relevant. The set was manually reviewed against menu names, restaurant fields, known nutrition,
-and a depth-20 pool from the baseline retriever.
+and candidate pools from token overlap, BM25, and dense retrieval.
 
 ## Metrics
 
@@ -59,8 +72,8 @@ When changing judgments:
 ## Limitations
 
 The current corpus is a chicken-oriented historical snapshot, so benchmark coverage reflects that
-scope. The first judgments have only one reviewer and are partially pooled from the token-overlap
-baseline, which favors lexical candidates and can miss relevant items neither system retrieves. The
+scope. The first judgments have only one reviewer and are pooled from the systems being compared,
+which can miss relevant items none of those systems retrieves. The
 dataset is appropriate for regression and initial comparisons, but not for broad claims about meal
 recommendation quality. Future versions should add independent reviewers, inter-rater agreement,
 broader cuisine coverage, adversarial constraints, and deeper pooled judgments.

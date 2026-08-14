@@ -1,10 +1,10 @@
-from rag.bm25 import BM25_VERSION, build_index, search_menu_bm25
+from rag.bm25 import BM25_VERSION, build_index, normalize_query, search_menu_bm25
 
 
 def test_bm25_index_covers_the_deduplicated_catalog():
     index = build_index()
 
-    assert BM25_VERSION == "bm25-v1-k1.2-b0.0-name3"
+    assert BM25_VERSION == "bm25-v2-k1.2-b0.0-name3-spell0.86"
     assert len(index.documents) == 448
     assert index.average_length > 0
     assert index.document_frequencies["chicken"] > 0
@@ -12,6 +12,16 @@ def test_bm25_index_covers_the_deduplicated_catalog():
 
 def test_bm25_returns_no_zero_overlap_fallbacks():
     assert search_menu_bm25("zzzxxyy") == []
+    assert search_menu_bm25("shrimp") == []
+
+
+def test_bm25_corrects_only_close_out_of_vocabulary_terms():
+    index = build_index()
+
+    assert normalize_query("chiken", index) == ("chicken", ["chiken->chicken"])
+    assert normalize_query("shrimp", index) == ("shrimp", [])
+    assert normalize_query("chicken noodle soup", index) == ("chicken noodle soup", [])
+    assert search_menu_bm25("chiken")
 
 
 def test_bm25_preserves_strict_nutrition_filters():

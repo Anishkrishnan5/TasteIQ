@@ -39,6 +39,7 @@ class AppliedFilters(BaseModel):
 
 
 class TimingMetadata(BaseModel):
+    query_understanding_ms: float
     retrieval_ms: float
     response_ms: float
 
@@ -50,6 +51,11 @@ class ResponseMetadata(BaseModel):
     timings_ms: TimingMetadata
     retriever_version: str
     catalog_sha256: str
+    normalized_query: str
+    query_corrections: list[str] = Field(default_factory=list)
+    retrieval_mode: str
+    degraded: bool
+    degraded_reason: str | None = None
 
 
 class RecommendationResponse(BaseModel):

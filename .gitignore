@@ -147,6 +147,8 @@ celerybeat.pid
 # Generated retrieval artifacts
 *.index
 faiss_meta.json
+backend/database/vector_index.npz
+backend/database/vector_index.manifest.json
 
 # Local databases and journals
 backend/tasteiq.db

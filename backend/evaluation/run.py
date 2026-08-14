@@ -17,12 +17,14 @@ from evaluation.metrics import (
     reciprocal_rank_at_k,
 )
 from rag.bm25 import BM25_VERSION, search_menu_bm25
+from rag.dense import DENSE_VERSION, search_menu_dense
+from rag.hybrid import HYBRID_VERSION, search_menu_hybrid
 from rag.retriever import DEFAULT_DATA_PATH, RETRIEVER_VERSION, load_items, search_menu
 
 BACKEND_ROOT = Path(__file__).parents[1]
 PROJECT_ROOT = BACKEND_ROOT.parent
 DEFAULT_JUDGMENTS = Path(__file__).with_name("judgments-v1.json")
-DEFAULT_OUTPUT = PROJECT_ROOT / "docs" / "reports" / "evaluation-bm25-v1.json"
+DEFAULT_OUTPUT = PROJECT_ROOT / "docs" / "reports" / "evaluation-bm25-v2.json"
 SearchFunction = Callable[..., list[dict[str, Any]]]
 
 
@@ -161,15 +163,25 @@ def main() -> int:
     parser.add_argument("--judgments", type=Path, default=DEFAULT_JUDGMENTS)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--k", type=int, default=10)
-    parser.add_argument("--retriever", choices=("bm25", "token"), default="bm25")
+    parser.add_argument("--retriever", choices=("bm25", "token", "dense", "hybrid"), default="bm25")
+    parser.add_argument(
+        "--report-only",
+        action="store_true",
+        help="Write metrics without enforcing minimum thresholds.",
+    )
     args = parser.parse_args()
     if args.k < 1:
         parser.error("--k must be at least 1")
 
     judgments_path = args.judgments.resolve()
     dataset = json.loads(judgments_path.read_text(encoding="utf-8"))
-    search = search_menu_bm25 if args.retriever == "bm25" else search_menu
-    retriever_version = BM25_VERSION if args.retriever == "bm25" else RETRIEVER_VERSION
+    retrievers = {
+        "bm25": (search_menu_bm25, BM25_VERSION),
+        "token": (search_menu, RETRIEVER_VERSION),
+        "dense": (search_menu_dense, DENSE_VERSION),
+        "hybrid": (search_menu_hybrid, HYBRID_VERSION),
+    }
+    search, retriever_version = retrievers[args.retriever]
     report = evaluate(dataset, search, k=args.k, retriever_version=retriever_version)
     report["artifacts"] = {
         "judgments": str(judgments_path.relative_to(PROJECT_ROOT)),
@@ -181,7 +193,7 @@ def main() -> int:
     args.output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     print(f"Wrote evaluation report to {args.output}")
     print(json.dumps(report["summary"], sort_keys=True))
-    return int(not all(report["quality_gate"].values()))
+    return int(not args.report_only and not all(report["quality_gate"].values()))
 
 
 if __name__ == "__main__":

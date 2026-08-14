@@ -26,7 +26,7 @@
     "snapshot_top_result_matches": 6,
     "snapshot_result_count_matches": 6,
     "all_snapshot_matches": true,
-    "median_query_p95_ms": 1.04
+    "median_query_p95_ms": 0.944
   },
   "cases": [
     {
@@ -39,9 +39,9 @@
       "result_count_matches_snapshot": true,
       "known_defect": null,
       "latency_ms": {
-        "median": 1.032,
-        "p95": 1.112,
-        "max": 1.135
+        "median": 1.051,
+        "p95": 1.109,
+        "max": 1.234
       }
     },
     {
@@ -54,9 +54,9 @@
       "result_count_matches_snapshot": true,
       "known_defect": null,
       "latency_ms": {
-        "median": 0.953,
-        "p95": 1.083,
-        "max": 1.776
+        "median": 0.938,
+        "p95": 0.946,
+        "max": 0.963
       }
     },
     {
@@ -69,9 +69,9 @@
       "result_count_matches_snapshot": true,
       "known_defect": null,
       "latency_ms": {
-        "median": 0.935,
-        "p95": 0.969,
-        "max": 0.974
+        "median": 0.93,
+        "p95": 0.939,
+        "max": 0.951
       }
     },
     {
@@ -84,9 +84,9 @@
       "result_count_matches_snapshot": true,
       "known_defect": null,
       "latency_ms": {
-        "median": 0.963,
-        "p95": 1.014,
-        "max": 1.075
+        "median": 0.931,
+        "p95": 0.942,
+        "max": 0.948
       }
     },
     {
@@ -99,9 +99,9 @@
       "result_count_matches_snapshot": true,
       "known_defect": null,
       "latency_ms": {
-        "median": 0.959,
-        "p95": 1.067,
-        "max": 2.072
+        "median": 0.927,
+        "p95": 0.937,
+        "max": 0.953
       }
     },
     {
@@ -114,9 +114,9 @@
       "result_count_matches_snapshot": true,
       "known_defect": null,
       "latency_ms": {
-        "median": 0.944,
-        "p95": 1.007,
-        "max": 1.389
+        "median": 0.927,
+        "p95": 1.023,
+        "max": 1.515
       }
     }
   ]

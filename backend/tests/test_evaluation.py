@@ -12,6 +12,7 @@ from evaluation.metrics import (
     reciprocal_rank_at_k,
 )
 from evaluation.run import DEFAULT_JUDGMENTS, evaluate, validate_dataset
+from rag.bm25 import search_menu_bm25
 
 
 def load_dataset():
@@ -56,7 +57,7 @@ def test_dataset_validation_rejects_duplicate_case_ids():
 
 
 def test_current_retriever_evaluation_has_zero_safety_regressions():
-    report = evaluate(load_dataset())
+    report = evaluate(load_dataset(), search_menu_bm25)
 
     assert report["summary"]["cases"] == 34
     assert report["summary"]["constraint_violation_rate"] == 0

@@ -3,13 +3,19 @@ BACKEND_VENV := backend/.venv
 BACKEND_PYTHON := $(BACKEND_VENV)/bin/python
 BACKEND_PIP := $(BACKEND_VENV)/bin/pip
 
-.PHONY: bootstrap check test lint typecheck build compose-check verify-reports reports eval compare clean
+.PHONY: bootstrap bootstrap-ml embeddings check test lint typecheck build compose-check verify-reports reports eval compare eval-ml compare-ml clean
 
 bootstrap:
 	$(PYTHON) -m venv $(BACKEND_VENV)
 	$(BACKEND_PIP) install --upgrade pip
 	$(BACKEND_PIP) install -r backend/requirements-dev.txt
 	npm --prefix frontend ci
+
+bootstrap-ml: bootstrap
+	$(BACKEND_PIP) install -r backend/requirements-ml.txt
+
+embeddings:
+	cd backend && .venv/bin/python -m rag.dense build
 
 check: lint typecheck test build compose-check verify-reports
 
@@ -22,7 +28,7 @@ verify-reports:
 reports:
 	cd backend && .venv/bin/python -m tools.data_report --check
 	cd backend && .venv/bin/python -m tools.retrieval_baseline
-	cd backend && .venv/bin/python -m evaluation.run --retriever token --output ../docs/reports/evaluation-token-overlap-v2.json
+	cd backend && .venv/bin/python -m evaluation.run --retriever token --report-only --output ../docs/reports/evaluation-token-overlap-v2.json
 	$(MAKE) eval
 	$(MAKE) compare
 
@@ -31,6 +37,13 @@ eval:
 
 compare:
 	cd backend && .venv/bin/python -m evaluation.compare
+
+eval-ml:
+	cd backend && .venv/bin/python -m evaluation.run --retriever dense --report-only --output ../docs/reports/evaluation-dense-v1.json
+	cd backend && .venv/bin/python -m evaluation.run --retriever hybrid --report-only --output ../docs/reports/evaluation-hybrid-v1.json
+
+compare-ml:
+	cd backend && .venv/bin/python -m evaluation.compare_hybrid
 
 test:
 	cd backend && .venv/bin/pytest

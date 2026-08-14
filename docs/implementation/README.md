@@ -33,6 +33,7 @@ Do not claim planned functionality as implemented. Measurements must identify th
 | Phase 1 — Trustworthy data and API | Complete | [03-trustworthy-data-and-api.md](03-trustworthy-data-and-api.md) |
 | Phase 3A — Evaluation foundation | Complete | [04-evaluation-foundation.md](04-evaluation-foundation.md) |
 | Phase 3B — BM25 lexical retrieval | Complete | [05-bm25-lexical-retrieval.md](05-bm25-lexical-retrieval.md) |
+| Phase 3C — Semantic experiment and query correction | Complete | [06-semantic-experiment.md](06-semantic-experiment.md) |
 
 ## Relationship to other documentation
 
