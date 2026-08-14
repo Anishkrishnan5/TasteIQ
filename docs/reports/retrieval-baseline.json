@@ -16,58 +16,62 @@
   },
   "artifacts": {
     "fixture": "backend/tests/fixtures/retrieval_baseline.json",
-    "fixture_sha256": "12e21d1a2ac7e37fd8afa00b40524cf431268218599f117766fe5d9d914d6bb5",
+    "fixture_sha256": "0fec4087ace07dbbe7639ec1c6480c3f4d7eb7e0a8f97e96f36bc81bb3457349",
     "catalog": "database/rag_items.jsonl",
-    "catalog_sha256": "9596c4fbc2928a33107fcf98f66853cb28913101af04081485bf5ebfae1572c6",
-    "catalog_records": 920
+    "catalog_sha256": "5e877303417a530ca6f1752d02215ecac0db5e1ab3e820b391cad2ae002fe50b",
+    "catalog_records": 448
   },
   "summary": {
     "cases": 6,
     "snapshot_top_result_matches": 6,
+    "snapshot_result_count_matches": 6,
     "all_snapshot_matches": true,
-    "median_query_p95_ms": 2.02
+    "median_query_p95_ms": 1.046
   },
   "cases": [
     {
       "query": "chicken",
       "limit": 5,
       "result_count": 5,
-      "top_spoonacular_id": 306973,
-      "expected_top_spoonacular_id": 306973,
+      "top_spoonacular_id": 237079,
+      "expected_top_spoonacular_id": 237079,
       "top_result_matches_snapshot": true,
+      "result_count_matches_snapshot": true,
       "known_defect": null,
       "latency_ms": {
-        "median": 2.027,
-        "p95": 2.722,
-        "max": 6.979
+        "median": 1.046,
+        "p95": 1.197,
+        "max": 1.626
       }
     },
     {
       "query": "burger",
       "limit": 5,
-      "result_count": 5,
+      "result_count": 4,
       "top_spoonacular_id": 368408,
       "expected_top_spoonacular_id": 368408,
       "top_result_matches_snapshot": true,
+      "result_count_matches_snapshot": true,
       "known_defect": null,
       "latency_ms": {
-        "median": 1.794,
-        "p95": 1.931,
-        "max": 2.842
+        "median": 0.967,
+        "p95": 1.028,
+        "max": 1.075
       }
     },
     {
       "query": "salad",
       "limit": 5,
-      "result_count": 5,
-      "top_spoonacular_id": 269545,
-      "expected_top_spoonacular_id": 269545,
+      "result_count": 4,
+      "top_spoonacular_id": 370322,
+      "expected_top_spoonacular_id": 370322,
       "top_result_matches_snapshot": true,
+      "result_count_matches_snapshot": true,
       "known_defect": null,
       "latency_ms": {
-        "median": 1.768,
-        "p95": 1.948,
-        "max": 2.518
+        "median": 0.957,
+        "p95": 1.087,
+        "max": 1.132
       }
     },
     {
@@ -77,39 +81,42 @@
       "top_spoonacular_id": 374803,
       "expected_top_spoonacular_id": 374803,
       "top_result_matches_snapshot": true,
+      "result_count_matches_snapshot": true,
       "known_defect": null,
       "latency_ms": {
-        "median": 1.788,
-        "p95": 1.886,
-        "max": 2.972
+        "median": 0.967,
+        "p95": 1.063,
+        "max": 1.567
       }
     },
     {
       "query": "spicy dinner",
       "limit": 5,
       "result_count": 5,
-      "top_spoonacular_id": 389571,
-      "expected_top_spoonacular_id": 389571,
+      "top_spoonacular_id": 317624,
+      "expected_top_spoonacular_id": 317624,
       "top_result_matches_snapshot": true,
+      "result_count_matches_snapshot": true,
       "known_defect": null,
       "latency_ms": {
-        "median": 1.804,
-        "p95": 2.092,
-        "max": 2.982
+        "median": 0.951,
+        "p95": 1.009,
+        "max": 1.112
       }
     },
     {
       "query": "zzzxxyy",
       "limit": 5,
-      "result_count": 5,
-      "top_spoonacular_id": 306973,
-      "expected_top_spoonacular_id": 306973,
+      "result_count": 0,
+      "top_spoonacular_id": null,
+      "expected_top_spoonacular_id": null,
       "top_result_matches_snapshot": true,
-      "known_defect": "Nutrition-presence bonus admits unrelated zero-overlap results.",
+      "result_count_matches_snapshot": true,
+      "known_defect": null,
       "latency_ms": {
-        "median": 1.793,
-        "p95": 2.445,
-        "max": 22.24
+        "median": 0.952,
+        "p95": 1.007,
+        "max": 1.119
       }
     }
   ]

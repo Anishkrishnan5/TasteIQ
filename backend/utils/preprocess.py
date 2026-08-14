@@ -306,7 +306,11 @@ def clean_one_menu_item(raw: dict[str, Any]) -> CleanedMenuItem | None:
         return None
 
     restaurant = clean_text(
-        raw.get("restaurant") or raw.get("restaurant_name") or raw.get("brand") or ""
+        raw.get("restaurant")
+        or raw.get("restaurant_name")
+        or raw.get("restaurantChain")
+        or raw.get("brand")
+        or ""
     )
     cuisine = normalize_cuisine(raw.get("cuisine") or raw.get("cuisines") or "")
 
@@ -371,7 +375,10 @@ def preprocess_menu_items(
         "seen": 0,
         "kept": 0,
         "dropped_missing_name": 0,
+        "dropped_duplicate": 0,
     }
+    seen_source_ids: set[int] = set()
+    seen_item_ids: set[str] = set()
 
     for raw in raw_items:
         stats["seen"] += 1
@@ -379,6 +386,17 @@ def preprocess_menu_items(
         if cleaned is None:
             stats["dropped_missing_name"] += 1
             continue
+        source_id = cleaned.raw_source.get("spoonacular_id")
+        if (
+            isinstance(source_id, int)
+            and source_id in seen_source_ids
+            or cleaned.item_id in seen_item_ids
+        ):
+            stats["dropped_duplicate"] += 1
+            continue
+        if isinstance(source_id, int):
+            seen_source_ids.add(source_id)
+        seen_item_ids.add(cleaned.item_id)
         out.append(cleaned)
         stats["kept"] += 1
 

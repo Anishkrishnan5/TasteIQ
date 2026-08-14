@@ -7,11 +7,11 @@ def test_current_data_integrity_gates_pass():
     report = build_report(DEFAULT_CATALOG, DEFAULT_DATABASE)
 
     assert all(report["quality_gate"].values())
-    assert report["catalog"]["valid_records"] == 920
-    assert report["catalog"]["unique"]["spoonacular_id"] == 460
-    assert report["catalog"]["duplicates"]["spoonacular_id"]["extra_rows"] == 460
+    assert report["catalog"]["valid_records"] == 448
+    assert report["catalog"]["unique"]["spoonacular_id"] == 448
+    assert report["catalog"]["duplicates"]["spoonacular_id"]["extra_rows"] == 0
     assert report["database"]["menu_item_details"] == 51
-    assert report["runtime_enrichment"]["catalog_records_with_detail"] == 102
+    assert report["runtime_enrichment"]["catalog_records_with_detail"] == 51
     assert report["runtime_enrichment"]["unique_source_ids_with_detail"] == 51
 
 

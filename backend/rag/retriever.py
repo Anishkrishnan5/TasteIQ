@@ -4,6 +4,7 @@ import json
 import re
 import sqlite3
 from functools import lru_cache
+from hashlib import sha256
 from pathlib import Path
 
 from core.config import settings
@@ -11,6 +12,7 @@ from core.config import settings
 DEFAULT_DATA_PATH = Path(__file__).parents[1] / "database" / "rag_items.jsonl"
 DEFAULT_DB_PATH = Path(__file__).parents[1] / "database" / "tasteiq.db"
 WORD_RE = re.compile(r"[a-z0-9]+")
+RETRIEVER_VERSION = "token-overlap-v2"
 
 
 def _tokens(value: str) -> set[str]:
@@ -30,6 +32,12 @@ def load_items(path: str | None = None) -> list[dict]:
             except (TypeError, json.JSONDecodeError):
                 continue
     return items
+
+
+@lru_cache(maxsize=4)
+def catalog_sha256(path: str | None = None) -> str:
+    source = Path(path or settings.rag_data_path or DEFAULT_DATA_PATH)
+    return sha256(source.read_bytes()).hexdigest()
 
 
 @lru_cache(maxsize=1)
@@ -71,9 +79,8 @@ def search_menu(
     limit: int = 6,
     max_calories: float | None = None,
     min_protein: float | None = None,
-    diet: str | None = None,
 ) -> list[dict]:
-    query_tokens = _tokens(" ".join(filter(None, [query, diet or ""])))
+    query_tokens = _tokens(query)
     ranked = []
     for item in load_items():
         metadata = dict(item.get("metadata", {}))
@@ -84,9 +91,9 @@ def search_menu(
                 metadata[key] = value
         calories = metadata.get("calories")
         protein = metadata.get("protein_g")
-        if max_calories is not None and calories is not None and calories > max_calories:
+        if max_calories is not None and (calories is None or calories > max_calories):
             continue
-        if min_protein is not None and protein is not None and protein < min_protein:
+        if min_protein is not None and (protein is None or protein < min_protein):
             continue
         searchable = (
             item.get("embedding_text", "") + " " + " ".join(metadata.get("derived_tags", []))
@@ -94,12 +101,6 @@ def search_menu(
         overlap = len(query_tokens & _tokens(searchable))
         name_overlap = len(query_tokens & _tokens(metadata.get("name", "")))
         score = overlap + name_overlap * 1.5
-        if calories is not None:
-            score += 0.25
-        if diet and diet.replace("-", "_").lower() in metadata.get("diet_tags", []) + metadata.get(
-            "derived_tags", []
-        ):
-            score += 3
         if query_tokens and score == 0:
             continue
         ranked.append((score, item, metadata))

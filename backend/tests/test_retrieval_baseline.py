@@ -14,5 +14,6 @@ def test_token_overlap_baseline(case):
     results = search_menu(case["query"], case["limit"])
 
     assert len(results) == case["expected_result_count"]
-    assert results[0]["spoonacular_id"] == case["expected_top_spoonacular_id"]
+    top_id = results[0]["spoonacular_id"] if results else None
+    assert top_id == case["expected_top_spoonacular_id"]
     assert len({result["spoonacular_id"] for result in results}) == len(results)

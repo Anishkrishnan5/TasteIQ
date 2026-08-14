@@ -11,9 +11,9 @@
   },
   "catalog": {
     "path": "backend/database/rag_items.jsonl",
-    "sha256": "9596c4fbc2928a33107fcf98f66853cb28913101af04081485bf5ebfae1572c6",
-    "total_lines": 920,
-    "valid_records": 920,
+    "sha256": "5e877303417a530ca6f1752d02215ecac0db5e1ab3e820b391cad2ae002fe50b",
+    "total_lines": 448,
+    "valid_records": 448,
     "malformed_json": {
       "count": 0,
       "line_numbers": []
@@ -30,31 +30,31 @@
     },
     "duplicates": {
       "id": {
-        "groups": 430,
-        "extra_rows": 490
+        "groups": 0,
+        "extra_rows": 0
       },
       "spoonacular_id": {
-        "groups": 460,
-        "extra_rows": 460
+        "groups": 0,
+        "extra_rows": 0
       },
       "normalized_name": {
-        "groups": 430,
-        "extra_rows": 490
+        "groups": 12,
+        "extra_rows": 18
       }
     },
     "unique": {
-      "id": 430,
-      "spoonacular_id": 460,
+      "id": 448,
+      "spoonacular_id": 448,
       "normalized_name": 430
     },
     "metadata_coverage": {
       "name": {
-        "known": 920,
+        "known": 448,
         "percent": 100.0
       },
       "restaurant": {
-        "known": 0,
-        "percent": 0.0
+        "known": 448,
+        "percent": 100.0
       },
       "cuisine": {
         "known": 0,
@@ -103,15 +103,16 @@
     "invalid_detail_payloads": 0
   },
   "runtime_enrichment": {
-    "catalog_records_with_detail": 102,
-    "catalog_record_percent": 11.09,
+    "catalog_records_with_detail": 51,
+    "catalog_record_percent": 11.38,
     "unique_source_ids_with_detail": 51,
-    "unique_source_id_percent": 11.09,
-    "unique_catalog_source_ids": 460
+    "unique_source_id_percent": 11.38,
+    "unique_catalog_source_ids": 448
   },
   "quality_gate": {
     "malformed_json_is_zero": true,
     "all_records_have_ids": true,
-    "all_records_have_names": true
+    "all_records_have_names": true,
+    "duplicate_source_ids_is_zero": true
   }
 }

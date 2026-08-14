@@ -194,6 +194,9 @@ def build_report(catalog_path: Path, database_path: Path) -> dict[str, Any]:
             "malformed_json_is_zero": catalog["malformed_json"]["count"] == 0,
             "all_records_have_ids": catalog["missing_required_structure"]["id"] == 0,
             "all_records_have_names": catalog["missing_required_structure"]["name"] == 0,
+            "duplicate_source_ids_is_zero": (
+                catalog["duplicates"]["spoonacular_id"]["extra_rows"] == 0
+            ),
         },
     }
 

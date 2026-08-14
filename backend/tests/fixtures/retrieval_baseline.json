@@ -1,24 +1,24 @@
 {
   "version": 1,
-  "description": "Phase 0 token-overlap baseline before correctness changes",
+  "description": "Phase 1 corrected token-overlap baseline",
   "cases": [
     {
       "query": "chicken",
       "limit": 5,
-      "expected_top_spoonacular_id": 306973,
+      "expected_top_spoonacular_id": 237079,
       "expected_result_count": 5
     },
     {
       "query": "burger",
       "limit": 5,
       "expected_top_spoonacular_id": 368408,
-      "expected_result_count": 5
+      "expected_result_count": 4
     },
     {
       "query": "salad",
       "limit": 5,
-      "expected_top_spoonacular_id": 269545,
-      "expected_result_count": 5
+      "expected_top_spoonacular_id": 370322,
+      "expected_result_count": 4
     },
     {
       "query": "pizza",
@@ -29,15 +29,14 @@
     {
       "query": "spicy dinner",
       "limit": 5,
-      "expected_top_spoonacular_id": 389571,
+      "expected_top_spoonacular_id": 317624,
       "expected_result_count": 5
     },
     {
       "query": "zzzxxyy",
       "limit": 5,
-      "expected_top_spoonacular_id": 306973,
-      "expected_result_count": 5,
-      "known_defect": "Nutrition-presence bonus admits unrelated zero-overlap results."
+      "expected_top_spoonacular_id": null,
+      "expected_result_count": 0
     }
   ]
 }

@@ -1,36 +1,21 @@
-from fastapi import APIRouter, Depends
-from pydantic import BaseModel, Field
+from fastapi import APIRouter, Request
 
-from core.errors import BadRequestError
+from api.schemas import ErrorResponse, RecommendationRequest, RecommendationResponse
+from core.config import settings
 from rag.pipeline import recommend
 
 router = APIRouter()
 
 
-def get_app_version():
-    return "0.1.0"
-
-
 @router.get("/health")
-def health(version: str = Depends(get_app_version)):
-    return {"status": "ok", "version": version}
+def health():
+    return {"status": "ok", "version": settings.app_version}
 
 
-class RecommendationRequest(BaseModel):
-    query: str = Field(min_length=2, max_length=300)
-    limit: int = Field(default=6, ge=1, le=20)
-    max_calories: float | None = Field(default=None, gt=0)
-    min_protein: float | None = Field(default=None, ge=0)
-    diet: str | None = Field(default=None, max_length=40)
-
-
-@router.post("/api/recommendations")
-def recommendations(request: RecommendationRequest):
-    return recommend(**request.model_dump())
-
-
-@router.get("/test-error")
-def test_error(q: int):
-    if q < 0:
-        raise BadRequestError("q must be non-negative")
-    return {"q": q}
+@router.post(
+    "/api/recommendations",
+    response_model=RecommendationResponse,
+    responses={422: {"model": ErrorResponse}},
+)
+def recommendations(payload: RecommendationRequest, request: Request):
+    return recommend(**payload.model_dump(), request_id=request.state.request_id)

@@ -2,7 +2,7 @@
 
 **Status:** Working design  
 **Audience:** Project contributors  
-**Last updated:** 2026-08-01
+**Last updated:** 2026-08-14
 
 This document defines the intended end-to-end architecture for TasteIQ and the order in which it should be built. It is an internal implementation plan, not a statement that every component already exists.
 
@@ -91,10 +91,10 @@ JSON response
 
 ### 4.3 Current gaps
 
-- Source records are duplicated and metadata coverage is low.
+- The runtime catalog is deduplicated, but metadata coverage remains low.
 - Runtime retrieval is token overlap rather than vector or hybrid search.
 - Natural-language constraints are not parsed into structured filters.
-- Nutrition filters are not exposed in the frontend.
+- Calorie and protein filters are exposed; dietary metadata is not yet trustworthy enough to filter.
 - There is no formal relevance benchmark.
 - There are no user accounts, profiles, or interaction events.
 - SQLite and JSONL are acting as runtime stores without migrations or provenance.

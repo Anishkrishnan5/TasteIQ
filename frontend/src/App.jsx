@@ -3,9 +3,11 @@ import { getRecommendations } from './services/api'
 import './App.css'
 
 const suggestions = ['high-protein chicken', 'light lunch', 'spicy dinner', 'vegetarian bowl']
+const emptyFilters = { max_calories: '', min_protein: '' }
 
 function App() {
   const [query, setQuery] = useState('')
+  const [filters, setFilters] = useState(emptyFilters)
   const [results, setResults] = useState([])
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
@@ -19,11 +21,19 @@ function App() {
     setLoading(true)
     setError('')
     try {
-      const data = await getRecommendations(nextQuery)
+      const appliedFilters = Object.fromEntries(
+        Object.entries(filters)
+          .filter(([, value]) => value !== '')
+          .map(([key, value]) => [key, Number(value)]),
+      )
+      const data = await getRecommendations(nextQuery, appliedFilters)
       setResults(data.results)
       setMessage(data.message)
-    } catch {
-      setError('TasteIQ could not reach the API. Make sure the backend is running on port 8000.')
+    } catch (requestError) {
+      setError(
+        requestError.response?.data?.error?.message ||
+          'TasteIQ could not reach the API. Make sure the backend is running on port 8000.',
+      )
     } finally {
       setLoading(false)
     }
@@ -37,8 +47,16 @@ function App() {
         <h1>Your next favorite meal,<br /><em>matched to you.</em></h1>
         <p className="intro">Describe what you’re craving. TasteIQ searches real menu data and returns focused recommendations in seconds.</p>
         <form onSubmit={search}>
-          <input aria-label="Describe your meal" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Try “high-protein chicken under 600 calories”" />
-          <button disabled={loading}>{loading ? 'Searching…' : 'Find my meal →'}</button>
+          <div className="query-row">
+            <input aria-label="Describe your meal" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Try “spicy chicken”" />
+            <button disabled={loading}>{loading ? 'Searching…' : 'Find my meal →'}</button>
+          </div>
+          <div className="filters" aria-label="Nutrition filters">
+            <label>Maximum calories<input type="number" min="1" max="5000" value={filters.max_calories} onChange={(event) => setFilters({ ...filters, max_calories: event.target.value })} placeholder="Any" /></label>
+            <label>Minimum protein<input type="number" min="0" max="500" value={filters.min_protein} onChange={(event) => setFilters({ ...filters, min_protein: event.target.value })} placeholder="Any" /><span>grams</span></label>
+            {(filters.max_calories || filters.min_protein) && <button type="button" className="clear-filters" onClick={() => setFilters(emptyFilters)}>Clear filters</button>}
+            <p>Filtered results include only items with known nutrition data.</p>
+          </div>
         </form>
         <div className="suggestions">
           <span>Try</span>{suggestions.map((item) => <button key={item} onClick={(e) => search(e, item)}>{item}</button>)}

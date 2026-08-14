@@ -8,9 +8,9 @@ The current release is a local MVP. TasteIQ is being developed into an evaluated
 
 - Responsive React search experience
 - FastAPI recommendation API with request validation
-- Local retrieval over 900+ prepared menu records
-- Result deduplication
-- Optional calorie, protein, and diet constraints
+- Local retrieval over 448 deduplicated menu records
+- Ingestion-time and response-level deduplication
+- Optional calorie and protein constraints with strict unknown-value handling
 - SQLite enrichment for available restaurant and nutrition details
 - Docker and Docker Compose support
 - Backend API tests and frontend lint/build checks
@@ -88,12 +88,13 @@ Example request:
   "query": "high-protein chicken",
   "limit": 6,
   "max_calories": 650,
-  "min_protein": 20,
-  "diet": "low-carb"
+  "min_protein": 20
 }
 ```
 
-Only `query` is required. Constraints are applied when the corresponding metadata is known; missing values remain explicitly unknown.
+Only `query` is required. When a nutrition constraint is supplied, records with unknown values are
+excluded so every returned item is known to satisfy the constraint. Dietary filters are not exposed
+until the dataset contains trustworthy dietary metadata.
 
 ## Tests and checks
 

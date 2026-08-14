@@ -37,6 +37,7 @@ def measure_case(case: dict[str, Any], repetitions: int) -> dict[str, Any]:
         durations.append((perf_counter() - started) * 1000)
 
     actual_top_id = results[0].get("spoonacular_id") if results else None
+    result_count_matches = len(results) == case["expected_result_count"]
     return {
         "query": case["query"],
         "limit": case["limit"],
@@ -44,6 +45,7 @@ def measure_case(case: dict[str, Any], repetitions: int) -> dict[str, Any]:
         "top_spoonacular_id": actual_top_id,
         "expected_top_spoonacular_id": case["expected_top_spoonacular_id"],
         "top_result_matches_snapshot": actual_top_id == case["expected_top_spoonacular_id"],
+        "result_count_matches_snapshot": result_count_matches,
         "known_defect": case.get("known_defect"),
         "latency_ms": {
             "median": round(statistics.median(durations), 3),
@@ -58,7 +60,10 @@ def build_baseline(fixture_path: Path, repetitions: int) -> dict[str, Any]:
     load_items()
     load_details()
     cases = [measure_case(case, repetitions) for case in fixture["cases"]]
-    all_snapshot_matches = all(case["top_result_matches_snapshot"] for case in cases)
+    all_snapshot_matches = all(
+        case["top_result_matches_snapshot"] and case["result_count_matches_snapshot"]
+        for case in cases
+    )
     return {
         "report_version": 1,
         "baseline": "deterministic token overlap with SQLite enrichment",
@@ -86,6 +91,9 @@ def build_baseline(fixture_path: Path, repetitions: int) -> dict[str, Any]:
             "cases": len(cases),
             "snapshot_top_result_matches": sum(
                 case["top_result_matches_snapshot"] for case in cases
+            ),
+            "snapshot_result_count_matches": sum(
+                case["result_count_matches_snapshot"] for case in cases
             ),
             "all_snapshot_matches": all_snapshot_matches,
             "median_query_p95_ms": round(
