@@ -3,6 +3,7 @@ import json
 
 import pytest
 
+from evaluation.compare import compare
 from evaluation.metrics import (
     constraint_violations,
     ndcg_at_k,
@@ -66,3 +67,12 @@ def test_current_retriever_evaluation_has_zero_safety_regressions():
     assert report["summary"]["mrr_at_10"] > 0
     assert report["summary"]["ndcg_at_10"] > 0
     assert all(report["quality_gate"].values())
+
+
+def test_bm25_comparison_preserves_quality_and_safety():
+    report = compare(load_dataset())
+
+    assert report["comparison"]["quality_not_worse"]
+    assert report["comparison"]["safety_preserved"]
+    assert report["comparison"]["no_result_preserved"]
+    assert report["comparison"]["query_losses"] == 0

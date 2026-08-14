@@ -23,7 +23,7 @@ def test_recommendations():
     assert all("name" in item for item in body["results"])
     assert body["meta"]["result_count"] == len(body["results"])
     assert body["meta"]["request_id"] == response.headers["x-request-id"]
-    assert body["meta"]["retriever_version"] == "token-overlap-v2"
+    assert body["meta"]["retriever_version"] == "bm25-v1-k1.2-b0.0-name3"
     assert len(body["meta"]["catalog_sha256"]) == 64
 
 

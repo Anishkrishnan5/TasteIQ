@@ -31,6 +31,7 @@ jobs:
       - run: python -m tools.data_report --check --output /tmp/tasteiq-data-quality.json
       - run: python -m tools.retrieval_baseline --repetitions 5 --output /tmp/tasteiq-retrieval-baseline.json
       - run: python -m evaluation.run --output /tmp/tasteiq-evaluation.json
+      - run: python -m evaluation.compare --output /tmp/tasteiq-comparison.json
 
   frontend:
     runs-on: ubuntu-latest

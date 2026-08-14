@@ -7,9 +7,12 @@ Run it from the repository root:
 make eval
 ```
 
-The command evaluates the active retriever against
+The command evaluates the active BM25 retriever against
 `backend/evaluation/judgments-v1.json` and writes a detailed report under `docs/reports/`. `make check`
 also runs the evaluation against minimum quality and safety thresholds.
+
+`make compare` regenerates the controlled BM25-versus-token-overlap comparison, including aggregate
+deltas, per-query wins/losses, warm-cache latency, cold index-build time, and incremental index memory.
 
 ## Current dataset
 

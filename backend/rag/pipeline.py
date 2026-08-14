@@ -1,6 +1,7 @@
 from time import perf_counter
 
-from rag.retriever import RETRIEVER_VERSION, catalog_sha256, search_menu
+from rag.bm25 import BM25_VERSION, search_menu_bm25
+from rag.retriever import catalog_sha256
 
 
 def recommend(
@@ -11,7 +12,7 @@ def recommend(
     request_id: str = "",
 ) -> dict:
     started = perf_counter()
-    items = search_menu(query, limit, max_calories, min_protein)
+    items = search_menu_bm25(query, limit, max_calories, min_protein)
     retrieval_ms = (perf_counter() - started) * 1000
     if items:
         names = ", ".join(item["name"].title() for item in items[:3])
@@ -35,7 +36,7 @@ def recommend(
                 "retrieval_ms": round(retrieval_ms, 3),
                 "response_ms": round((perf_counter() - started) * 1000, 3),
             },
-            "retriever_version": RETRIEVER_VERSION,
+            "retriever_version": BM25_VERSION,
             "catalog_sha256": catalog_sha256(),
         },
     }

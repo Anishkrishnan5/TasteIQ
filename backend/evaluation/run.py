@@ -16,12 +16,13 @@ from evaluation.metrics import (
     recall_at_k,
     reciprocal_rank_at_k,
 )
+from rag.bm25 import BM25_VERSION, search_menu_bm25
 from rag.retriever import DEFAULT_DATA_PATH, RETRIEVER_VERSION, load_items, search_menu
 
 BACKEND_ROOT = Path(__file__).parents[1]
 PROJECT_ROOT = BACKEND_ROOT.parent
 DEFAULT_JUDGMENTS = Path(__file__).with_name("judgments-v1.json")
-DEFAULT_OUTPUT = PROJECT_ROOT / "docs" / "reports" / "evaluation-token-overlap-v2.json"
+DEFAULT_OUTPUT = PROJECT_ROOT / "docs" / "reports" / "evaluation-bm25-v1.json"
 SearchFunction = Callable[..., list[dict[str, Any]]]
 
 
@@ -160,13 +161,16 @@ def main() -> int:
     parser.add_argument("--judgments", type=Path, default=DEFAULT_JUDGMENTS)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--k", type=int, default=10)
+    parser.add_argument("--retriever", choices=("bm25", "token"), default="bm25")
     args = parser.parse_args()
     if args.k < 1:
         parser.error("--k must be at least 1")
 
     judgments_path = args.judgments.resolve()
     dataset = json.loads(judgments_path.read_text(encoding="utf-8"))
-    report = evaluate(dataset, k=args.k)
+    search = search_menu_bm25 if args.retriever == "bm25" else search_menu
+    retriever_version = BM25_VERSION if args.retriever == "bm25" else RETRIEVER_VERSION
+    report = evaluate(dataset, search, k=args.k, retriever_version=retriever_version)
     report["artifacts"] = {
         "judgments": str(judgments_path.relative_to(PROJECT_ROOT)),
         "judgments_sha256": _sha256(judgments_path),

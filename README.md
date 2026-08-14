@@ -11,16 +11,20 @@ The current release is a local MVP. TasteIQ is being developed into an evaluated
 - Local retrieval over 448 deduplicated menu records
 - Ingestion-time and response-level deduplication
 - Optional calorie and protein constraints with strict unknown-value handling
+- Deterministic BM25 lexical ranking with a versioned 34-query evaluation suite
+- Request IDs, stage timings, and catalog/retriever version metadata
 - SQLite enrichment for available restaurant and nutrition details
 - Docker and Docker Compose support
 - Backend API tests and frontend lint/build checks
 
-The current runtime uses deterministic token-overlap ranking. Hybrid vector retrieval, reranking, personalization, PostgreSQL, Redis, and the proposed Rust retrieval service are planned work—not current functionality.
+The current runtime uses deterministic BM25 lexical ranking. Dense vector retrieval, hybrid fusion,
+reranking, personalization, PostgreSQL, Redis, and the proposed Rust retrieval service are planned
+work—not current functionality.
 
 ## Architecture
 
 ```text
-React client → FastAPI → local retriever → JSONL menu catalog
+React client → FastAPI → BM25 retriever → JSONL menu catalog
                                   └──────→ SQLite enrichment
 ```
 
@@ -113,8 +117,8 @@ make reports
 ```
 
 The reports under `docs/reports/` record artifact hashes, duplicate and metadata coverage, baseline
-query outputs, known retrieval defects, and local latency methodology. They are measurements of the
-current snapshot, not production performance claims.
+query outputs, formal retrieval metrics, BM25 comparison results, and local latency methodology. They
+are measurements of the current snapshot, not production performance claims.
 
 Run the versioned offline relevance evaluation independently:
 

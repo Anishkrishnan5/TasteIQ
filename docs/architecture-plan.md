@@ -71,7 +71,7 @@ React application
 FastAPI
   │
   ▼
-Token-overlap retriever
+BM25 lexical retriever
   ├── JSONL catalog
   └── SQLite enrichment
   │
@@ -92,7 +92,7 @@ JSON response
 ### 4.3 Current gaps
 
 - The runtime catalog is deduplicated, but metadata coverage remains low.
-- Runtime retrieval is token overlap rather than vector or hybrid search.
+- Runtime retrieval is BM25 lexical search rather than vector or hybrid search.
 - Natural-language constraints are not parsed into structured filters.
 - Calorie and protein filters are exposed; dietary metadata is not yet trustworthy enough to filter.
 - A first 34-query relevance benchmark exists; it remains small and single-reviewer.

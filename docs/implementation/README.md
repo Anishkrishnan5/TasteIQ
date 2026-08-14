@@ -32,6 +32,7 @@ Do not claim planned functionality as implemented. Measurements must identify th
 | Phase 0C — Baseline and data report | Complete | [02-baseline-and-data-report.md](02-baseline-and-data-report.md) |
 | Phase 1 — Trustworthy data and API | Complete | [03-trustworthy-data-and-api.md](03-trustworthy-data-and-api.md) |
 | Phase 3A — Evaluation foundation | Complete | [04-evaluation-foundation.md](04-evaluation-foundation.md) |
+| Phase 3B — BM25 lexical retrieval | Complete | [05-bm25-lexical-retrieval.md](05-bm25-lexical-retrieval.md) |
 
 ## Relationship to other documentation
 
