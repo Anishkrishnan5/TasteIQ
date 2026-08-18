@@ -3,7 +3,7 @@ BACKEND_VENV := backend/.venv
 BACKEND_PYTHON := $(BACKEND_VENV)/bin/python
 BACKEND_PIP := $(BACKEND_VENV)/bin/pip
 
-.PHONY: bootstrap bootstrap-ml bootstrap-mlops embeddings check test lint typecheck build compose-check verify-reports reports eval compare eval-ml compare-ml experiment mlflow-ui clean
+.PHONY: bootstrap bootstrap-ml bootstrap-mlops embeddings check test test-e2e lint typecheck build compose-check verify-reports reports eval compare eval-ml compare-ml experiment mlflow-ui clean
 
 bootstrap:
 	$(PYTHON) -m venv $(BACKEND_VENV)
@@ -56,6 +56,9 @@ mlflow-ui:
 
 test:
 	cd backend && .venv/bin/pytest
+
+test-e2e:
+	npm --prefix frontend run test:e2e
 
 lint:
 	cd backend && .venv/bin/ruff check .

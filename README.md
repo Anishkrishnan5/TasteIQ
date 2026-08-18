@@ -17,7 +17,8 @@ The current release is a local MVP. TasteIQ is being developed into an evaluated
 - Request IDs, stage timings, and catalog/retriever version metadata
 - SQLite enrichment for available restaurant and nutrition details
 - Docker and Docker Compose support
-- Backend API tests and frontend lint/build checks
+- Non-root API and web containers with health checks
+- Backend API tests, frontend checks, and a real Playwright browser journey
 
 The default runtime uses the measured BM25 winner. Dense vector retrieval and reciprocal-rank fusion
 are implemented as an opt-in experiment, but are not the default because the current hybrid benchmark
@@ -46,7 +47,11 @@ Bootstrap both applications and all development checks from the repository root:
 ```bash
 make bootstrap
 make check
+make test-e2e
 ```
+
+The browser test starts the real FastAPI and React applications, submits a misspelled query with
+nutrition filters, and verifies correction metadata, constraint-safe API results, and rendered cards.
 
 Start the backend:
 

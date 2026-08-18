@@ -12,3 +12,11 @@ htmlcov/
 tests/
 database/*.index
 database/faiss_meta.json
+database/vector_index.npz
+database/vector_index.manifest.json
+mlflow.db
+mlruns/
+evaluation/
+requirements-dev.txt
+requirements-ml.txt
+requirements-mlops.txt
