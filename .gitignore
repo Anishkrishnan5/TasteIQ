@@ -150,6 +150,10 @@ faiss_meta.json
 backend/database/vector_index.npz
 backend/database/vector_index.manifest.json
 
+# Local MLflow tracking state
+backend/mlflow.db
+backend/mlruns/
+
 # Local databases and journals
 backend/tasteiq.db
 *.db-journal

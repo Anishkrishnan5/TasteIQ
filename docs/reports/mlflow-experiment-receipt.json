@@ -1,0 +1,73 @@
+{
+  "experiment": "tasteiq-retrieval",
+  "tracking_uri": "sqlite:///mlflow.db",
+  "parent_run_id": "48c69026a8b1477fb4dd7ef3d239f760",
+  "retriever_run_ids": {
+    "bm25": "b8deedfc758941c38fe01de4a304430c",
+    "dense": "f109d2d2fc2447a08a9af75623ad8cbc",
+    "hybrid": "c256580a7d93492388728bd3827d4ad5"
+  },
+  "decision": "retain_bm25",
+  "lineage": {
+    "tasteiq.git_revision": "cb7b72403aa920c9d86033ef8221f940f04f1b98",
+    "tasteiq.dataset_version": "judgments-v1",
+    "tasteiq.judgments_sha256": "3ab75f428a171aa10b85bada885f30d69ac56b52312ca5a2a4c9fb6645cc0da7",
+    "tasteiq.catalog_sha256": "5e877303417a530ca6f1752d02215ecac0db5e1ab3e820b391cad2ae002fe50b",
+    "tasteiq.model_revision": "ea78891063587eb050ed4166b20062eaf978037c"
+  },
+  "metrics": {
+    "bm25": {
+      "precision_at_5": 0.74,
+      "recall_at_10": 0.9208,
+      "mrr_at_10": 1.0,
+      "ndcg_at_10": 0.9711,
+      "constraint_violation_rate": 0.0,
+      "duplicate_result_rate": 0.0,
+      "no_result_accuracy": 1,
+      "empty_result_rate": 0.1176,
+      "median_latency_ms": 0.325
+    },
+    "dense": {
+      "precision_at_5": 0.5933,
+      "recall_at_10": 0.794,
+      "mrr_at_10": 0.8417,
+      "ndcg_at_10": 0.7654,
+      "constraint_violation_rate": 0.0,
+      "duplicate_result_rate": 0.0,
+      "no_result_accuracy": 0,
+      "empty_result_rate": 0,
+      "median_latency_ms": 5.223
+    },
+    "hybrid": {
+      "precision_at_5": 0.6933,
+      "recall_at_10": 0.9115,
+      "mrr_at_10": 0.9548,
+      "ndcg_at_10": 0.913,
+      "constraint_violation_rate": 0.0,
+      "duplicate_result_rate": 0.0,
+      "no_result_accuracy": 1,
+      "empty_result_rate": 0.1176,
+      "median_latency_ms": 5.426
+    }
+  },
+  "comparison": {
+    "aggregate_deltas": {
+      "precision_at_5": -0.0467,
+      "recall_at_10": -0.0093,
+      "mrr_at_10": -0.0452,
+      "ndcg_at_10": -0.0581,
+      "constraint_violation_rate": 0.0,
+      "duplicate_result_rate": 0.0,
+      "no_result_accuracy": 0,
+      "median_latency_ms": 5.101
+    },
+    "query_wins": 0,
+    "query_ties": 21,
+    "query_losses": 13,
+    "quality_not_worse": false,
+    "safety_preserved": true,
+    "no_result_preserved": true,
+    "adopt_hybrid": false,
+    "decision": "retain_bm25"
+  }
+}

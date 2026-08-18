@@ -90,6 +90,22 @@ Start the API with `RETRIEVAL_MODE=hybrid` to opt in. If the pinned model or val
 unavailable, the request automatically falls back to BM25 and reports the degraded mode in response
 metadata. Generated vectors are not committed; the manifest pins the model revision and catalog hash.
 
+### Track the experiment lifecycle
+
+MLflow is an optional layer over the same checked-in evaluator. It records a parent champion-selection
+run, child BM25/dense/hybrid runs, exact code and data lineage, retrieval parameters, metrics, and the
+full comparison artifact:
+
+```bash
+make bootstrap-mlops
+make embeddings
+make experiment
+make mlflow-ui
+```
+
+Open <http://127.0.0.1:5000> to inspect the runs. Local MLflow database and artifact files are ignored;
+the portable experiment receipt under `docs/reports/` records the verified decision and run lineage.
+
 ## API
 
 ### Health
@@ -157,6 +173,8 @@ rejected-but-reproducible semantic experiment. Near-term work should broaden the
 improve semantic relevance before enabling hybrid search, and add deployment and observability.
 
 See [docs/architecture-plan.md](docs/architecture-plan.md) for the internal system design and phased delivery plan.
+The bounded [`v1.0.0` portfolio release scope](docs/portfolio-release-scope.md) is the authoritative
+definition of completion; the broader architecture plan remains a source of optional future ideas.
 
 ## License
 

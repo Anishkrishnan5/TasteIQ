@@ -27,6 +27,28 @@ make compare-ml
 ML dependencies and generated vectors are separate from `make bootstrap` and `make check`. This keeps
 the default development and CI path small while preserving a reproducible semantic experiment.
 
+## MLflow tracking
+
+Run the full champion/challenger workflow locally with:
+
+```bash
+make bootstrap-mlops
+make embeddings
+make experiment
+make mlflow-ui
+```
+
+`make experiment` creates a parent selection run and BM25, dense, and hybrid child runs. It logs:
+
+- Git revision, catalog hash, judgment hash, dataset version, and embedding-model revision
+- Retriever and fusion parameters
+- Precision@5, Recall@10, MRR@10, nDCG@10, latency, no-result behavior, and safety metrics
+- Query-level wins, ties, losses, aggregate deltas, and the promotion decision
+- The complete comparison report as an artifact
+
+The default tracking URI is a local SQLite database. Set `MLFLOW_TRACKING_URI` to use a remote tracking
+server. MLflow is not a runtime API dependency and the application continues to work without it.
+
 ## Current dataset
 
 The first version contains 34 cases:

@@ -3,7 +3,7 @@ BACKEND_VENV := backend/.venv
 BACKEND_PYTHON := $(BACKEND_VENV)/bin/python
 BACKEND_PIP := $(BACKEND_VENV)/bin/pip
 
-.PHONY: bootstrap bootstrap-ml embeddings check test lint typecheck build compose-check verify-reports reports eval compare eval-ml compare-ml clean
+.PHONY: bootstrap bootstrap-ml bootstrap-mlops embeddings check test lint typecheck build compose-check verify-reports reports eval compare eval-ml compare-ml experiment mlflow-ui clean
 
 bootstrap:
 	$(PYTHON) -m venv $(BACKEND_VENV)
@@ -13,6 +13,9 @@ bootstrap:
 
 bootstrap-ml: bootstrap
 	$(BACKEND_PIP) install -r backend/requirements-ml.txt
+
+bootstrap-mlops: bootstrap-ml
+	$(BACKEND_PIP) install -r backend/requirements-mlops.txt
 
 embeddings:
 	cd backend && .venv/bin/python -m rag.dense build
@@ -44,6 +47,12 @@ eval-ml:
 
 compare-ml:
 	cd backend && .venv/bin/python -m evaluation.compare_hybrid
+
+experiment:
+	cd backend && .venv/bin/python -m evaluation.track_experiment
+
+mlflow-ui:
+	cd backend && .venv/bin/mlflow server --backend-store-uri sqlite:///mlflow.db --default-artifact-root ./mlruns --host 127.0.0.1 --port 5000
 
 test:
 	cd backend && .venv/bin/pytest
