@@ -21,9 +21,12 @@ export default defineConfig({
   webServer: [
     {
       name: 'api',
-      command: '.venv/bin/uvicorn app:app --host 127.0.0.1 --port 8000',
+      command: '.venv/bin/alembic upgrade head && .venv/bin/uvicorn app:app --host 127.0.0.1 --port 8000',
       cwd: '../backend',
-      env: { FRONTEND_ORIGIN: 'http://127.0.0.1:4173' },
+      env: {
+        FRONTEND_ORIGIN: 'http://127.0.0.1:4173',
+        DATABASE_URL: 'sqlite:////tmp/tasteiq-playwright.db',
+      },
       url: 'http://127.0.0.1:8000/health',
       reuseExistingServer: !process.env.CI,
       timeout: 30_000,

@@ -2,18 +2,15 @@ import json
 from pathlib import Path
 from typing import Any
 
-from database.db import get_connection
+from database.db import connection
 from utils.preprocess import preprocess_menu_items
 
 OUT_PATH = Path(__file__).parent / "rag_items.jsonl"
 
 
 def load_raw_items() -> list[dict[str, Any]]:
-    conn = get_connection()
-    cur = conn.cursor()
-    cur.execute("SELECT spoonacular_id, payload FROM raw_menu_items")
-    rows = cur.fetchall()
-    conn.close()
+    with connection() as conn:
+        rows = conn.execute("SELECT spoonacular_id, payload FROM raw_menu_items").fetchall()
 
     raw_items: list[dict[str, Any]] = []
     bad = 0
@@ -22,7 +19,7 @@ def load_raw_items() -> list[dict[str, Any]]:
         payload_txt = r["payload"]
         try:
             payload = json.loads(payload_txt) if payload_txt else {}
-        except Exception:
+        except (TypeError, json.JSONDecodeError):
             bad += 1
             payload = {}
 
@@ -38,7 +35,7 @@ def load_raw_items() -> list[dict[str, Any]]:
     return raw_items
 
 
-def main():
+def main() -> None:
     raw_items = load_raw_items()
     cleaned, stats = preprocess_menu_items(raw_items)
     print("Preprocess stats:", stats)

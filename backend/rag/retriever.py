@@ -37,6 +37,8 @@ def load_items(path: str | None = None) -> list[dict]:
 @lru_cache(maxsize=4)
 def catalog_sha256(path: str | None = None) -> str:
     source = Path(path or settings.rag_data_path or DEFAULT_DATA_PATH)
+    if not source.exists():
+        return sha256(b"").hexdigest()
     return sha256(source.read_bytes()).hexdigest()
 
 

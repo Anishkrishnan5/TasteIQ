@@ -3,7 +3,7 @@ BACKEND_VENV := backend/.venv
 BACKEND_PYTHON := $(BACKEND_VENV)/bin/python
 BACKEND_PIP := $(BACKEND_VENV)/bin/pip
 
-.PHONY: bootstrap bootstrap-ml bootstrap-mlops embeddings check test test-e2e lint typecheck build compose-check verify-reports reports eval compare eval-ml compare-ml experiment mlflow-ui clean
+.PHONY: bootstrap bootstrap-ml bootstrap-mlops embeddings db-up db-migrate check release-check test test-e2e lint typecheck build compose-check infra-check security-check verify-reports reports eval compare eval-ml compare-ml experiment mlflow-ui clean
 
 bootstrap:
 	$(PYTHON) -m venv $(BACKEND_VENV)
@@ -20,7 +20,15 @@ bootstrap-mlops: bootstrap-ml
 embeddings:
 	cd backend && .venv/bin/python -m rag.dense build
 
+db-up:
+	docker compose up -d postgres
+
+db-migrate:
+	cd backend && .venv/bin/alembic upgrade head
+
 check: lint typecheck test build compose-check verify-reports
+
+release-check: check security-check infra-check test-e2e
 
 verify-reports:
 	cd backend && .venv/bin/python -m tools.data_report --check --output /tmp/tasteiq-data-quality.json
@@ -59,6 +67,16 @@ test:
 
 test-e2e:
 	npm --prefix frontend run test:e2e
+
+security-check:
+	npm audit --prefix frontend --omit=dev
+
+infra-check:
+	terraform fmt -check -recursive infra
+	terraform -chdir=infra/bootstrap init -backend=false -input=false
+	terraform -chdir=infra/bootstrap validate
+	terraform -chdir=infra/app init -backend=false -input=false
+	terraform -chdir=infra/app validate
 
 lint:
 	cd backend && .venv/bin/ruff check .

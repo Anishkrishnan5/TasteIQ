@@ -11,6 +11,10 @@ The current release is a local MVP. TasteIQ is being developed into an evaluated
 - Local retrieval over 448 deduplicated menu records
 - Ingestion-time and response-level deduplication
 - Optional calorie and protein constraints with strict unknown-value handling
+- PostgreSQL-backed profiles, preferences, saved meals, and search history
+- Explainable preference-aware reranking with disliked-ingredient exclusion
+- Grounded conversational answers with validated menu-item citations
+- Optional Gemini generation with a deterministic no-key/provider-outage fallback
 - Deterministic BM25 ranking with conservative, corpus-aware spelling correction
 - A versioned 34-query evaluation suite with checked-in comparison reports
 - Optional pinned dense retrieval and RRF hybrid search with BM25 outage fallback
@@ -25,12 +29,17 @@ are implemented as an opt-in experiment, but are not the default because the cur
 underperforms BM25. Reranking, personalization, PostgreSQL, Redis, and the proposed Rust retrieval
 service remain planned work.
 
+Chat retrieval is always local and grounded in the same catalog. Gemini is optional: when configured,
+it explains the retrieved records conversationally; when absent, unavailable, malformed, or missing
+valid citations, TasteIQ returns a deterministic answer over those same records.
+
 ## Architecture
 
 ```text
 React client → FastAPI → BM25 retriever ─────────→ JSONL menu catalog
                          └→ optional dense + RRF ─┘
-                                      └──────────→ SQLite enrichment
+                                      ├──────────→ SQLite catalog enrichment
+                                      └──────────→ PostgreSQL personalization
 ```
 
 The proposed production architecture and implementation sequence are documented in [docs/architecture-plan.md](docs/architecture-plan.md).
@@ -46,6 +55,8 @@ Bootstrap both applications and all development checks from the repository root:
 
 ```bash
 make bootstrap
+make db-up
+make db-migrate
 make check
 make test-e2e
 ```
@@ -72,6 +83,11 @@ npm run dev
 ```
 
 Open <http://localhost:5173>. Interactive API documentation is available at <http://localhost:8000/docs>.
+
+The profile panel creates a local demo identity without authentication. Preferences are normalized and
+stored in PostgreSQL. Personalized searches retrieve a wider grounded candidate set, exclude known
+disliked ingredients, and apply small documented boosts for favorite cuisines, supported dietary
+goals, and saved items. Every personalized search is recorded in the profile history.
 
 To run both services with Docker:
 
@@ -140,6 +156,46 @@ Example request:
 Only `query` is required. When a nutrition constraint is supplied, records with unknown values are
 excluded so every returned item is known to satisfy the constraint. Dietary filters are not exposed
 until the dataset contains trustworthy dietary metadata.
+
+Pass a profile UUID as `profile_id` to enable preference-aware reranking and record the search in that
+profile's history. Demo profile endpoints are intentionally unauthenticated for this personal MVP:
+
+```text
+POST   /api/profiles
+GET    /api/profiles/{profile_id}
+PUT    /api/profiles/{profile_id}
+GET    /api/profiles/{profile_id}/saved
+POST   /api/profiles/{profile_id}/saved
+DELETE /api/profiles/{profile_id}/saved/{spoonacular_id}
+GET    /api/profiles/{profile_id}/history
+```
+
+This is not an account system. Add authentication and ownership checks before accepting data from
+multiple real users.
+
+### Grounded chat
+
+```http
+POST /api/chat
+Content-Type: application/json
+```
+
+```json
+{
+  "message": "What is a high-protein chicken option?",
+  "history": [],
+  "profile_id": null,
+  "min_protein": 20
+}
+```
+
+The response includes the answer, validated menu citations, provider/model metadata, retrieval
+lineage, and an explicit degraded reason when the local fallback is used. Recent user turns are folded
+into retrieval for conversational follow-ups, but only retrieved catalog records may be cited.
+
+To enable Gemini when running Docker, copy `.env.example` to `.env`, add a Google AI Studio key, and
+restart Compose. For direct backend development, use `backend/.env.example` instead. Both real `.env`
+files are ignored by Git. Do not use sensitive personal information with the Gemini free tier.
 
 ## Tests and checks
 

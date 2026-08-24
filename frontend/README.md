@@ -1,16 +1,25 @@
-# React + Vite
+# TasteIQ frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This directory contains the React and Vite interface for TasteIQ. It submits meal queries and
+optional nutrition constraints to the FastAPI service, then renders grounded menu results.
 
-Currently, two official plugins are available:
+## Development
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+```bash
+npm install
+npm run dev
+```
 
-## React Compiler
+The development server proxies `/api` and `/health` to `http://127.0.0.1:8000`; start the backend as
+described in the repository README. Set `VITE_API_URL` only when the API uses a different origin.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Checks
 
-## Expanding the ESLint configuration
+```bash
+npm run lint
+npm run build
+npm run test:e2e
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+The Playwright test starts both applications and exercises a real recommendation request. Production
+builds are served by unprivileged Nginx, which forwards same-origin API requests to the backend.

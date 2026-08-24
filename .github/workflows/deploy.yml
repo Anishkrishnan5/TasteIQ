@@ -1,0 +1,117 @@
+name: Deploy AWS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Git commit or tag to deploy; leave empty for the current revision
+        required: false
+        type: string
+
+concurrency:
+  group: tasteiq-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    if: vars.AWS_DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ vars.APP_URL }}
+    env:
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
+      ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}
+      ECS_SERVICE: ${{ vars.ECS_SERVICE }}
+      ECS_TASK_FAMILY: ${{ vars.ECS_TASK_FAMILY }}
+      WEB_BUCKET: ${{ vars.WEB_BUCKET }}
+      CLOUDFRONT_DISTRIBUTION_ID: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}
+      APP_URL: ${{ vars.APP_URL }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+
+      - name: Configure short-lived AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6.2.3
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Log in to Amazon ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2.1.6
+
+      - name: Resolve immutable deployment revision
+        id: revision
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Build and publish API image
+        env:
+          REGISTRY: ${{ steps.ecr.outputs.registry }}
+          IMAGE_TAG: ${{ steps.revision.outputs.sha }}
+        run: |
+          image="$REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          if ! aws ecr describe-images --repository-name "$ECR_REPOSITORY" --image-ids "imageTag=$IMAGE_TAG" >/dev/null 2>&1; then
+            docker build --tag "$image" backend
+            docker push "$image"
+          fi
+          digest=$(aws ecr describe-images --repository-name "$ECR_REPOSITORY" --image-ids "imageTag=$IMAGE_TAG" --query 'imageDetails[0].imageDigest' --output text)
+          echo "API_IMAGE=$REGISTRY/$ECR_REPOSITORY@$digest" >> "$GITHUB_ENV"
+
+      - name: Register immutable ECS task revision
+        run: |
+          aws ecs describe-task-definition --task-definition "$ECS_TASK_FAMILY" --query taskDefinition > /tmp/task-definition.json
+          jq --arg image "$API_IMAGE" '
+            .containerDefinitions |= map(if .name == "api" then .image = $image else . end)
+            | del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)
+          ' /tmp/task-definition.json > /tmp/task-definition-next.json
+          task_arn=$(aws ecs register-task-definition --cli-input-json file:///tmp/task-definition-next.json --query 'taskDefinition.taskDefinitionArn' --output text)
+          echo "TASK_DEFINITION_ARN=$task_arn" >> "$GITHUB_ENV"
+
+      - name: Deploy API and wait for stability
+        run: |
+          aws ecs update-service --cluster "$ECS_CLUSTER" --service "$ECS_SERVICE" --task-definition "$TASK_DEFINITION_ARN" >/dev/null
+          aws ecs wait services-stable --cluster "$ECS_CLUSTER" --services "$ECS_SERVICE"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Build frontend
+        run: |
+          npm ci --prefix frontend
+          npm run build --prefix frontend
+
+      - name: Publish frontend and invalidate cache
+        run: |
+          aws s3 sync frontend/dist "s3://$WEB_BUCKET" --delete
+          aws cloudfront create-invalidation --distribution-id "$CLOUDFRONT_DISTRIBUTION_ID" --paths '/*' >/dev/null
+
+      - name: Smoke-test deployed application
+        run: |
+          curl --fail --silent --show-error --retry 12 --retry-delay 10 "$APP_URL/health" | jq -e '.status == "ok"'
+          curl --fail --silent --show-error --retry 5 --retry-delay 5 \
+            -H 'Content-Type: application/json' \
+            --data '{"query":"chiken","max_calories":650,"min_protein":20,"limit":3}' \
+            "$APP_URL/api/recommendations" \
+            | jq -e '.meta.result_count > 0 and .meta.query_corrections == ["chiken->chicken"]'
+
+      - name: Write deployment summary
+        run: |
+          {
+            echo '### TasteIQ production deployment'
+            echo "- Git revision: \`${{ steps.revision.outputs.sha }}\`"
+            echo "- API image: \`$API_IMAGE\`"
+            echo "- ECS task: \`$TASK_DEFINITION_ARN\`"
+            echo "- Application: $APP_URL"
+          } >> "$GITHUB_STEP_SUMMARY"

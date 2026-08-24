@@ -1,4 +1,5 @@
 from typing import Annotated, Any, Literal
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 
@@ -12,6 +13,7 @@ class RecommendationRequest(BaseModel):
     limit: int = Field(default=6, ge=1, le=20)
     max_calories: float | None = Field(default=None, gt=0, le=5000)
     min_protein: float | None = Field(default=None, ge=0, le=500)
+    profile_id: UUID | None = None
 
 
 class MenuItem(BaseModel):
@@ -56,6 +58,8 @@ class ResponseMetadata(BaseModel):
     retrieval_mode: str
     degraded: bool
     degraded_reason: str | None = None
+    personalized: bool = False
+    profile_id: UUID | None = None
 
 
 class RecommendationResponse(BaseModel):
@@ -64,6 +68,40 @@ class RecommendationResponse(BaseModel):
     message: str
     results: list[MenuItem]
     meta: ResponseMetadata
+
+
+class ChatTurn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    role: Literal["user", "assistant"]
+    content: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=1000)]
+
+
+class ChatRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    message: Annotated[str, StringConstraints(strip_whitespace=True, min_length=2, max_length=1000)]
+    history: list[ChatTurn] = Field(default_factory=list, max_length=10)
+    profile_id: UUID | None = None
+    max_calories: float | None = Field(default=None, gt=0, le=5000)
+    min_protein: float | None = Field(default=None, ge=0, le=500)
+
+
+class ChatMetadata(BaseModel):
+    request_id: str
+    provider: Literal["gemini", "deterministic"]
+    model: str | None
+    grounded: Literal[True] = True
+    degraded: bool
+    degraded_reason: str | None
+    retrieval: ResponseMetadata
+
+
+class ChatResponse(BaseModel):
+    schema_version: Literal["1.0"] = API_SCHEMA_VERSION
+    answer: str
+    citations: list[MenuItem]
+    meta: ChatMetadata
 
 
 class ErrorBody(BaseModel):

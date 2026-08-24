@@ -1,52 +1,63 @@
+"""Fetch detailed nutrition data for catalog records that have not been enriched."""
+
 import json
 import os
-import sqlite3
 import time
 
 import requests
 
-API_KEY = os.getenv("SPOONACULAR_API_KEY")
-DB_PATH = "database/tasteiq.db"
+from database.db import connection
+from services.spoonacular_client import BASE_URL, REQUEST_TIMEOUT_SECONDS
 
-if not API_KEY:
-    raise Exception("Missing SPOONACULAR_API_KEY env var")
+HYDRATION_LIMIT = 200
+SLEEP_SECONDS = 0.3
 
-conn = sqlite3.connect(DB_PATH)
-cursor = conn.cursor()
 
-cursor.execute("""
-    SELECT spoonacular_id
-    FROM raw_menu_items
-    WHERE spoonacular_id NOT IN (
-        SELECT spoonacular_id FROM menu_item_details
-    )
-    LIMIT 200;
-""")
+def hydrate_menu_items(api_key: str, limit: int = HYDRATION_LIMIT) -> None:
+    """Hydrate up to ``limit`` records, preserving progress after each response."""
+    with connection() as conn:
+        rows = conn.execute(
+            """
+            SELECT spoonacular_id
+            FROM raw_menu_items
+            WHERE spoonacular_id NOT IN (
+                SELECT spoonacular_id FROM menu_item_details
+            )
+            LIMIT ?
+            """,
+            (limit,),
+        ).fetchall()
 
-ids = [row[0] for row in cursor.fetchall()]
-print(f"Hydrating {len(ids)} menu items")
+        source_ids = [row["spoonacular_id"] for row in rows]
+        print(f"Hydrating {len(source_ids)} menu items")
+        with requests.Session() as session:
+            for source_id in source_ids:
+                response = session.get(
+                    f"{BASE_URL}/food/menuItems/{source_id}",
+                    params={"apiKey": api_key},
+                    timeout=REQUEST_TIMEOUT_SECONDS,
+                )
+                if not response.ok:
+                    print(f"Failed {source_id}: HTTP {response.status_code}")
+                    continue
+                conn.execute(
+                    """
+                    INSERT OR REPLACE INTO menu_item_details (spoonacular_id, payload)
+                    VALUES (?, ?)
+                    """,
+                    (source_id, json.dumps(response.json())),
+                )
+                conn.commit()
+                time.sleep(SLEEP_SECONDS)
 
-for menu_id in ids:
-    url = f"https://api.spoonacular.com/food/menuItems/{menu_id}"
-    params = {"apiKey": API_KEY}
 
-    r = requests.get(url, params=params)
+def main() -> None:
+    api_key = os.getenv("SPOONACULAR_API_KEY")
+    if not api_key:
+        raise RuntimeError("SPOONACULAR_API_KEY is required to hydrate menu data.")
+    hydrate_menu_items(api_key)
+    print("Hydration complete.")
 
-    if r.status_code != 200:
-        print(f"❌ Failed {menu_id}: {r.status_code}")
-        continue
 
-    cursor.execute(
-        """
-        INSERT OR REPLACE INTO menu_item_details
-        (spoonacular_id, payload)
-        VALUES (?, ?)
-    """,
-        (menu_id, json.dumps(r.json())),
-    )
-
-    conn.commit()
-    time.sleep(0.3)
-
-conn.close()
-print("✅ Done")
+if __name__ == "__main__":
+    main()

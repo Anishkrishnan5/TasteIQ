@@ -32,3 +32,31 @@ test('searches with nutrition filters and renders grounded API results', async (
     payload.results[0].name,
   )
 })
+
+test('creates a profile, personalizes results, and saves a meal', async ({ page }) => {
+  await page.goto('/')
+
+  await page.getByLabel('Profile name').fill('Browser Demo')
+  await page.getByLabel('Diet preferences').fill('high_protein')
+  await page.getByRole('button', { name: 'Create profile' }).click()
+  await expect(page.getByText('Personalization active')).toBeVisible()
+
+  await page.getByLabel('Describe your meal').fill('chicken')
+  await page.getByRole('button', { name: 'Find my meal →' }).click()
+
+  await expect(page.locator('.match-reason').first()).toContainText('high_protein')
+  const firstCard = page.locator('.grid article').first()
+  await firstCard.getByRole('button', { name: 'Save', exact: true }).click()
+  await expect(firstCard.getByRole('button', { name: 'Saved', exact: true })).toBeVisible()
+})
+
+test('answers conversationally with grounded menu citations', async ({ page }) => {
+  await page.goto('/')
+
+  await page.getByRole('textbox', { name: 'Ask TasteIQ' }).fill('What is a high protein chicken option?')
+  await page.getByRole('button', { name: 'Send', exact: true }).click()
+
+  await expect(page.locator('.chat-turn.assistant')).toBeVisible()
+  await expect(page.getByLabel('Menu citations').first()).toBeVisible()
+  await expect(page.getByText('Local grounded fallback').first()).toBeVisible()
+})

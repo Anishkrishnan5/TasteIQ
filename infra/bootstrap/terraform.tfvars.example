@@ -1,0 +1,4 @@
+aws_region        = "us-west-2"
+github_repository = "your-github-user/TasteIQ"
+budget_alert_email = "you@example.com"
+monthly_budget_usd = 35

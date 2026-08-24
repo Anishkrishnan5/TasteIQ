@@ -82,6 +82,27 @@ def test_unknown_query_returns_no_unrelated_results():
     assert response.json()["results"] == []
 
 
+def test_missing_catalog_is_reported_without_crashing(monkeypatch, tmp_path):
+    import rag.bm25 as bm25
+    import rag.pipeline as pipeline
+    import rag.retriever as retriever
+
+    missing_catalog = tmp_path / "missing.jsonl"
+    monkeypatch.setattr(pipeline.settings, "rag_data_path", str(missing_catalog))
+    bm25.build_index.cache_clear()
+    retriever.load_items.cache_clear()
+    retriever.catalog_sha256.cache_clear()
+    try:
+        response = client.post("/api/recommendations", json={"query": "chicken"})
+    finally:
+        bm25.build_index.cache_clear()
+        retriever.load_items.cache_clear()
+        retriever.catalog_sha256.cache_clear()
+
+    assert response.status_code == 200
+    assert response.json()["results"] == []
+
+
 def test_close_misspelling_is_corrected_and_reported():
     response = client.post("/api/recommendations", json={"query": "chiken"})
     body = response.json()
@@ -108,3 +129,37 @@ def test_nutrition_filters_exclude_unknown_and_violating_values():
         for item in body["results"]
     )
     assert body["meta"]["filters"]["unknown_nutrition_policy"] == "exclude"
+
+
+def test_chat_uses_grounded_fallback_and_citations_without_api_key(monkeypatch):
+    import chat.service as chat_service
+
+    monkeypatch.setattr(chat_service.settings, "gemini_api_key", None)
+    response = client.post(
+        "/api/chat",
+        json={
+            "message": "What is a high protein chicken option?",
+            "history": [{"role": "user", "content": "I want chicken"}],
+            "min_protein": 20,
+        },
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["meta"]["grounded"] is True
+    assert body["meta"]["provider"] == "deterministic"
+    assert body["meta"]["degraded"] is True
+    assert body["citations"]
+    assert all(item["protein_g"] >= 20 for item in body["citations"])
+
+
+def test_chat_rejects_oversized_history():
+    response = client.post(
+        "/api/chat",
+        json={
+            "message": "chicken",
+            "history": [{"role": "user", "content": "chicken"}] * 11,
+        },
+    )
+
+    assert response.status_code == 422

@@ -1,7 +1,7 @@
 import json
 import time
 
-from database.db import get_connection, init_db
+from database.db import connection, init_db
 from services.spoonacular_client import fetch_menu_items
 
 QUERY = "chicken"
@@ -10,39 +10,25 @@ MAX_PAGES = 200
 SLEEP_SECONDS = 1.5
 
 
-def ingest():
+def ingest() -> None:
     init_db()
-    conn = get_connection()
-    cursor = conn.cursor()
-
-    offset = 0
-    page = 0
-
-    while page < MAX_PAGES:
-        print(f"Fetching page {page}...")
-        data = fetch_menu_items(QUERY, offset, PAGE_SIZE)
-
-        items = data.get("menuItems", [])
-
-        if not items:
-            print(f"No items found for page {page}, stopping ingestion.")
-            break
-        for item in items:
-            cursor.execute(
-                """
-                INSERT INTO raw_menu_items (spoonacular_id, payload)
-                VALUES (?, ?)
-            """,
-                (item.get("id"), json.dumps(item)),
+    with connection() as conn:
+        offset = 0
+        for page in range(MAX_PAGES):
+            print(f"Fetching page {page}...")
+            items = fetch_menu_items(QUERY, offset, PAGE_SIZE).get("menuItems", [])
+            if not items:
+                print(f"No items found for page {page}, stopping ingestion.")
+                break
+            conn.executemany(
+                "INSERT INTO raw_menu_items (spoonacular_id, payload) VALUES (?, ?)",
+                [(item.get("id"), json.dumps(item)) for item in items],
             )
-        conn.commit()
-        offset += PAGE_SIZE
-        page += 1
+            conn.commit()
+            offset += PAGE_SIZE
+            print(f"Stored {len(items)} items. Sleeping...")
+            time.sleep(SLEEP_SECONDS)
 
-        print(f"Stored {len(items)} items. Sleeping...")
-        time.sleep(SLEEP_SECONDS)
-
-    conn.close()
     print("Ingestion complete.")
 
 

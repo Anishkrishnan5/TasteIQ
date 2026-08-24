@@ -74,3 +74,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: docker compose config --quiet
+
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v4.0.1
+        with:
+          terraform_version: "1.15.8"
+      - run: terraform fmt -check -recursive infra
+      - run: terraform -chdir=infra/bootstrap init -backend=false -input=false
+      - run: terraform -chdir=infra/bootstrap validate
+      - run: terraform -chdir=infra/app init -backend=false -input=false
+      - run: terraform -chdir=infra/app validate

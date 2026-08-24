@@ -162,6 +162,17 @@ backend/tasteiq.db
 frontend/dist/
 frontend/playwright-report/
 frontend/test-results/
+
+# Terraform local state and provider cache
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
 .envrc
 .venv
 env/

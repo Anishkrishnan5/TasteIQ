@@ -10,6 +10,7 @@ from fastapi.responses import JSONResponse
 from api.routes import router
 from api.schemas import API_SCHEMA_VERSION
 from core.config import settings
+from personalization.routes import router as personalization_router
 
 
 def create_app() -> FastAPI:
@@ -53,6 +54,7 @@ def create_app() -> FastAPI:
         )
 
     app.include_router(router)
+    app.include_router(personalization_router)
 
     return app
 

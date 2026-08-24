@@ -3,6 +3,23 @@ from pathlib import Path
 from tools.data_report import DEFAULT_CATALOG, DEFAULT_DATABASE, build_report
 
 
+def test_database_initialization_creates_both_maintenance_tables(tmp_path, monkeypatch):
+    import database.db as db
+
+    monkeypatch.setattr(db, "DB_PATH", tmp_path / "tasteiq.db")
+    db.init_db()
+
+    with db.connection() as connection:
+        tables = {
+            row[0]
+            for row in connection.execute(
+                "SELECT name FROM sqlite_master WHERE type = 'table'"
+            ).fetchall()
+        }
+
+    assert {"raw_menu_items", "menu_item_details"} <= tables
+
+
 def test_current_data_integrity_gates_pass():
     report = build_report(DEFAULT_CATALOG, DEFAULT_DATABASE)
 
